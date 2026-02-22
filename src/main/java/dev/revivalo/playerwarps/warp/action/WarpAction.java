@@ -71,7 +71,7 @@ public interface WarpAction<T> {
 
         boolean proceeded = execute(player, warp, data);
 
-        if (proceeded && hasFee()) {
+        if (proceeded && hasFee() && !(this instanceof TeleportToWarpAction)) {
             HookRegister.ifEnabled(VaultHook.class, vaultHook -> {
                 vaultHook.getApi().withdrawPlayer(player, getFee());
             });
