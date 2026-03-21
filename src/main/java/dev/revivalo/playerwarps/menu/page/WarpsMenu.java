@@ -161,7 +161,7 @@ public class WarpsMenu extends Menu {
                                 case LEFT:
                                 case SHIFT_LEFT:
                                     player.closeInventory();
-                                    new PreTeleportToWarpAction().setMenuToOpen(this).proceed(player, warp);
+                                    new PreTeleportToWarpAction().proceed(player, warp);
                                     break;
                                 case RIGHT:
                                 case SHIFT_RIGHT:

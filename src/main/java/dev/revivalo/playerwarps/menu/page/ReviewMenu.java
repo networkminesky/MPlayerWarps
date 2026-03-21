@@ -26,10 +26,10 @@ public class ReviewMenu extends Menu implements Inputable {
 
         gui.setCloseGuiAction(event -> {
             final User user = UserHandler.getUser(player);
-            if (user.getPreviousMenu() != null && !(user.getPreviousMenu() instanceof ReviewMenu)) {
-//                PlayerWarpsPlugin.get().getLogger().info("Oteviram " + user.getPreviousMenu());
-//                PlayerWarpsPlugin.get().runDelayed(() -> user.getPreviousMenu().reOpen(), 3);
-            }
+//            if (user.getPreviousMenu() != null && !(user.getPreviousMenu() instanceof ReviewMenu)) {
+////                PlayerWarpsPlugin.get().getLogger().info("Oteviram " + user.getPreviousMenu());
+////                PlayerWarpsPlugin.get().runDelayed(() -> user.getPreviousMenu().reOpen(), 3);
+//            }
         });
     }
 

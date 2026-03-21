@@ -1,6 +1,7 @@
 package dev.revivalo.playerwarps.warp.action;
 
 import dev.revivalo.playerwarps.configuration.file.Lang;
+import dev.revivalo.playerwarps.menu.page.Menu;
 import dev.revivalo.playerwarps.user.UserHandler;
 import dev.revivalo.playerwarps.util.PermissionUtil;
 import dev.revivalo.playerwarps.util.TextUtil;
@@ -32,7 +33,8 @@ public class ReviewWarpAction implements WarpAction<Integer> {
             }
         }
 
-        UserHandler.getUser(player).getPreviousMenu().reOpen();
+
+        UserHandler.getUser(player).getPreviousMenu().ifPresent(Menu::reOpen);
 
 //        new DefaultWarpsMenu()
 //                .setPage((Integer) UserHandler.getUser(player).getData(DataSelectorType.ACTUAL_PAGE))

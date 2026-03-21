@@ -12,7 +12,6 @@ import dev.revivalo.playerwarps.hook.HookRegister;
 import dev.revivalo.playerwarps.util.NumberUtil;
 import dev.revivalo.playerwarps.util.PermissionUtil;
 import dev.revivalo.playerwarps.warp.Warp;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -2,9 +2,11 @@ package dev.revivalo.playerwarps.user;
 
 import dev.revivalo.playerwarps.menu.page.Menu;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class User {
     private final Player player;
@@ -23,6 +25,7 @@ public class User {
         return data;
     }
 
+    @Nullable
     public Object getData(DataSelectorType selection) {
         return data.get(selection);
     }
@@ -45,7 +48,7 @@ public class User {
         return player;
     }
 
-    public Menu getPreviousMenu() {
-        return (Menu) getData(DataSelectorType.PREVIOUS_MENU);
+    public Optional<Menu> getPreviousMenu() {
+        return Optional.ofNullable((Menu) getData(DataSelectorType.PREVIOUS_MENU));
     }
 }
