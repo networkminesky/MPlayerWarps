@@ -48,14 +48,16 @@ public abstract class MainCommand implements TabExecutor {
 
             Player player;
             try {
+                player = PlayerUtil.getPlayerFromName(args[1]);
+            } catch (NullPointerException | IndexOutOfBoundsException ex) {
+                player = (Player) sender;
+            }
+
+            if (!player.equals(sender)) {
                 if (!sender.hasPermission("playerwarps.teleport.others")) {
                     sender.sendMessage(Lang.INSUFFICIENT_PERMISSIONS.asColoredString().replace("%permission%", "playerwarps.teleport.others"));
                     return false;
                 }
-
-                player = PlayerUtil.getPlayerFromName(args[1]);
-            } catch (NullPointerException | IndexOutOfBoundsException ex) {
-                player = (Player) sender;
             }
 
             new PreTeleportToWarpAction().proceed(player, warpOptional.get());
