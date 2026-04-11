@@ -49,7 +49,7 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
         String[] languages = {
                 "English", "Czech", "Chinese", "French",
                 "German", "Polish", "Russian", "Turkish",
-                "Portuguese", "Spanish"
+                "Portuguese", "Spanish", "Italian"
         };
 
         for (String language : languages) {
