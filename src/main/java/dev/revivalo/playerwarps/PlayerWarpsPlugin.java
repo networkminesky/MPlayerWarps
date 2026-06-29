@@ -61,6 +61,9 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
         new Metrics(this, 12061);
         new UserHandler(this);
 
+        setWarpHandler(new WarpManager());
+        setDataManager(new Data());
+
         HookRegister.hook();
 
         if (Config.UPDATE_CHECKER.asBoolean()) {
@@ -89,9 +92,6 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
         }
 
         CategoryManager.loadCategories();
-
-        setWarpHandler(new WarpManager());
-        setDataManager(new Data());
 
         registerCommands();
 
