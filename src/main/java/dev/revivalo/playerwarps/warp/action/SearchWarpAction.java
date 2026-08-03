@@ -8,9 +8,8 @@ import dev.revivalo.playerwarps.util.PermissionUtil;
 import dev.revivalo.playerwarps.warp.Warp;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class SearchWarpAction implements WarpAction<String>, Inputable {
@@ -19,19 +18,22 @@ public class SearchWarpAction implements WarpAction<String>, Inputable {
         final List<Warp> warps = PlayerWarpsPlugin.getWarpHandler().getWarps().stream()
                 .filter(Warp::isAccessible).collect(Collectors.toList());
 
-        WarpSearch warpSearch = new WarpSearch(warps);
-        CompletableFuture<List<Warp>> future = warpSearch.searchAsync(input);
-        List<Warp> warpList = new ArrayList<>();
+        final WarpSearch warpSearch = new WarpSearch(warps);
 
-        future.thenAccept(warpList::addAll).thenRun(warpSearch::shutdown);
+        // The menu must not be opened before the search finishes, otherwise it renders an empty result.
+        warpSearch.searchAsync(input).whenComplete((foundWarps, throwable) -> {
+            warpSearch.shutdown();
 
-        try {
+            if (throwable != null) {
+                PlayerWarpsPlugin.get().getLogger().log(Level.WARNING, "Warp search failed", throwable);
+                return;
+            }
+
             PlayerWarpsPlugin.get().runSync(() ->
                     new WarpsMenu.DefaultWarpsMenu()
-                    .open(player, "all", PlayerWarpsPlugin.getWarpHandler().getSortingManager().getDefaultSortType(), warpList));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                            .open(player, "all", PlayerWarpsPlugin.getWarpHandler().getSortingManager().getDefaultSortType(), foundWarps));
+        });
+
         return true;
     }
 

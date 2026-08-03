@@ -110,7 +110,7 @@ public abstract class MainCommand implements TabExecutor {
 
         List<String> result = argumentMatcher.filter(tabCompletions, arg);
 
-        Collections.shuffle(result);
+        Collections.sort(result);
 
         return result;
     }

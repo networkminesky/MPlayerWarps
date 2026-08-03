@@ -3,6 +3,7 @@ package dev.revivalo.playerwarps.warp;
 import com.tchristofferson.configupdater.ConfigUpdater;
 import dev.revivalo.playerwarps.PlayerWarpsPlugin;
 import dev.revivalo.playerwarps.category.Category;
+import dev.revivalo.playerwarps.configuration.YamlFile;
 import dev.revivalo.playerwarps.configuration.file.Config;
 import dev.revivalo.playerwarps.configuration.file.Lang;
 import dev.revivalo.playerwarps.hook.register.BlueMapHook;
@@ -33,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
@@ -46,7 +48,9 @@ public class WarpManager {
     public WarpManager() {
         ConfigurationSerialization.registerClass(Warp.class);
 
-        warps = new HashSet<>();
+        // Read from the menu thread while the main thread creates and removes warps,
+        // so iteration must not throw a ConcurrentModificationException.
+        warps = ConcurrentHashMap.newKeySet();
 
         List<Sortable> sortableList = new ArrayList<>();
         for (String sortableFromConfig : Config.SORT_BY.asList()) {
@@ -111,13 +115,35 @@ public class WarpManager {
     }
 
     public void saveWarps() {
+        saveWarps(true);
+    }
+
+    /**
+     * Serializes all warps and writes them to data.yml. Serialization reads warp state and
+     * Bukkit objects, so it always runs on the calling (main) thread; only the file write can
+     * be offloaded. On shutdown the write has to stay synchronous, as the scheduler is gone.
+     */
+    public void saveWarps(boolean writeAsynchronously) {
         final ConfigurationSection warpsSection = PlayerWarpsPlugin.getData().getConfiguration().createSection("warps");
 
         warps.forEach(warp -> warpsSection.set(warp.getWarpID().toString(), warp));
 
-        PlayerWarpsPlugin.getData().getYamlFile().save();
+        final YamlFile dataFile = PlayerWarpsPlugin.getData().getYamlFile();
+        final String contents = PlayerWarpsPlugin.getData().getConfiguration().saveToString();
+        final int savedWarps = warps.size();
+
+        if (writeAsynchronously) {
+            PlayerWarpsPlugin.get().runAsync(() -> writeWarps(dataFile, contents, savedWarps));
+        } else {
+            writeWarps(dataFile, contents, savedWarps);
+        }
+    }
+
+    private void writeWarps(YamlFile dataFile, String contents, int savedWarps) {
+        dataFile.write(contents);
+
         if (Config.AUTOSAVE_ANNOUNCE.asBoolean()) {
-            Bukkit.getLogger().info("Saving " + warps.size() + " warps");
+            Bukkit.getLogger().info("Saving " + savedWarps + " warps");
         }
     }
 

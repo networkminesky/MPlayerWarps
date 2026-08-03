@@ -182,16 +182,22 @@ public enum Lang {
     RENAME_WARP_LORE,
     TELEPORTATION_PROGRESS;
 
-    private static final YamlFile langYamlFile = new YamlFile("lang/" + Config.LANGUAGE.asString() + ".yml",
-            PlayerWarpsPlugin.get().getDataFolder(), YamlFile.UpdateMethod.NEVER);
+    private static YamlFile langYamlFile;
     private static final Map<String, String> messages = new HashMap<>();
     private static final Map<String, List<String>> lists = new HashMap<>();
 
     public static void reload() {
-        langYamlFile.reload();
-        YamlConfiguration configuration = langYamlFile.getConfiguration();
+        // The configured language can change between reloads, so the file has to be
+        // re-resolved instead of being bound once at class initialization.
+        final String languageFilePath = "lang/" + Config.LANGUAGE.asString() + ".yml";
+        if (langYamlFile == null || !langYamlFile.getFilePath().equals(languageFilePath)) {
+            langYamlFile = new YamlFile(languageFilePath,
+                    PlayerWarpsPlugin.get().getDataFolder(), YamlFile.UpdateMethod.NEVER);
+        } else {
+            langYamlFile.reload();
+        }
 
-        PlayerWarpsPlugin.get().getLogger().info(configuration.getString("lang.teleportation-unsafe", "NULL"));
+        YamlConfiguration configuration = langYamlFile.getConfiguration();
 
         YamlConfiguration defaultConfig = new YamlConfiguration();
         try (InputStream defaultLangStream = PlayerWarpsPlugin.get().getResource("lang/English.yml")) {
@@ -227,13 +233,20 @@ public enum Lang {
 
         langYamlFile.save();
 
+        // Entries of the previously loaded language must not survive a language switch.
+        messages.clear();
+        lists.clear();
+
+        // Resolved up front so that %prefix% does not depend on the key order within the file.
+        final String prefix = TextUtil.colorize(langSection.getString("prefix", ""));
+
         langSection.getKeys(false).forEach(key -> {
             String editedKey = key.toUpperCase(Locale.ENGLISH).replace("-", "_");
             if (langSection.isList(key)) {
                 lists.put(editedKey, langSection.getStringList(key));
             } else {
                 messages.put(editedKey, Objects.requireNonNull(langSection.getString(key))
-                        .replace("%prefix%", Lang.PREFIX.asColoredString()));
+                        .replace("%prefix%", prefix));
             }
         });
     }

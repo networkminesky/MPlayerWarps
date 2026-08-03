@@ -1,5 +1,6 @@
 package dev.revivalo.playerwarps.menu.page;
 
+import dev.revivalo.playerwarps.PlayerWarpsPlugin;
 import dev.revivalo.playerwarps.category.Category;
 import dev.revivalo.playerwarps.category.CategoryManager;
 import dev.revivalo.playerwarps.configuration.file.Config;
@@ -7,8 +8,6 @@ import dev.revivalo.playerwarps.configuration.file.Lang;
 import dev.revivalo.playerwarps.menu.ActionsExecutor;
 import dev.revivalo.playerwarps.menu.MenuItem;
 import dev.revivalo.playerwarps.menu.sort.Sortable;
-import dev.revivalo.playerwarps.user.User;
-import dev.revivalo.playerwarps.user.UserHandler;
 import dev.revivalo.playerwarps.util.*;
 import dev.revivalo.playerwarps.warp.Warp;
 import dev.revivalo.playerwarps.warp.action.SaveWarpAction;
@@ -25,6 +24,7 @@ import org.bukkit.entity.Player;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 public class WarpsMenu extends Menu {
     private int page = 1;
@@ -47,40 +47,51 @@ public class WarpsMenu extends Menu {
 
     @Override
     public void fill(/*List<Warp> foundWarps*/) {
-        final User user = UserHandler.getUser(player);
-//        user.addData(DataSelectorType.ACTUAL_PAGE, paginatedGui.getCurrentPageNum());
-//        user.addData(DataSelectorType.ACTUAL_MENU, this);
-//        PlayerWarpsPlugin.get().getLogger().info("Ukladam " + categoryName);
-//        if (categoryName != null && !categoryName.equalsIgnoreCase("all")) user.addData(DataSelectorType.SELECTED_CATEGORY, categoryName);
-//        user.addData(DataSelectorType.SELECTED_SORT, sortType);
+        render(collectWarps());
+    }
+
+    /**
+     * Gathers and sorts the warps to display. Pure data work - it must not touch the Bukkit
+     * API so that it can run off the main thread.
+     */
+    private List<Warp> collectWarps() {
+        if (foundWarps != null) {
+            return foundWarps;
+        }
 
         final Category openedCategory = CategoryManager.getCategoryFromName(categoryName);
 
-        final List<Warp> warps = (foundWarps == null) ? new ArrayList<>() : foundWarps;
+        final List<Warp> warps = new ArrayList<>();
 
-        if (warps.isEmpty() && foundWarps == null) {
-            switch (this) {
-                case DefaultWarpsMenu ignored -> {
-                    if (openedCategory == null || openedCategory.isDefaultCategory()) {
-                        warps.addAll(getWarpHandler().getWarps().stream()
-                                .filter(Warp::isAccessible)
-                                .toList());
-                    } else {
-                        warps.addAll(getWarpHandler().getWarps().stream()
-                                .filter(warp -> warp.isAccessible() && (warp.getCategory() == null || warp.getCategory().getType().equalsIgnoreCase(categoryName)))
-                                .toList());
-                    }
+        switch (this) {
+            case DefaultWarpsMenu ignored -> {
+                if (openedCategory == null || openedCategory.isDefaultCategory()) {
+                    warps.addAll(getWarpHandler().getWarps().stream()
+                            .filter(Warp::isAccessible)
+                            .toList());
+                } else {
+                    warps.addAll(getWarpHandler().getWarps().stream()
+                            .filter(warp -> warp.isAccessible() && (warp.getCategory() == null || warp.getCategory().getType().equalsIgnoreCase(categoryName)))
+                            .toList());
+                }
 
-                    getWarpHandler().getSortingManager().sortWarps(warps, sortType); //TODO: Async
-                }
-                case MyWarpsMenu ignored ->
-                        warps.addAll(getWarpHandler().getWarps().stream().filter(warp -> warp.isOwner(player)).toList());
-                case FavoriteWarpsMenu ignored -> warps.addAll(getWarpHandler().getPlayerFavoriteWarps(player));
-                default -> {
-                }
+                getWarpHandler().getSortingManager().sortWarps(warps, sortType);
+            }
+            case MyWarpsMenu ignored ->
+                    warps.addAll(getWarpHandler().getWarps().stream().filter(warp -> warp.isOwner(player)).toList());
+            case FavoriteWarpsMenu ignored -> warps.addAll(getWarpHandler().getPlayerFavoriteWarps(player));
+            default -> {
             }
         }
 
+        return warps;
+    }
+
+    /**
+     * Builds the items and puts them into the inventory. Touches the Bukkit API, so it has to
+     * run on the main thread.
+     */
+    private void render(final List<Warp> warps) {
         for (MenuItem<?> item : getTemplate().getItems()) {
             getBaseGui().setItem(
                     item.getSlots(),
@@ -238,11 +249,20 @@ public class WarpsMenu extends Menu {
 
         paginatedGui.clearPageItems();
 
-        CompletableFuture.runAsync(this::fill, MENU_EXECUTOR).thenAccept(unused -> {
-            if (getTemplate().getLayout() != null) setLayout(getPlayer(), this);
-            sortingCooldowns.remove(player);
-            getBaseGui().update();
-        });
+        // Only the collecting and sorting runs asynchronously - drawing the items and updating
+        // the inventory has to happen back on the main thread.
+        CompletableFuture.supplyAsync(this::collectWarps, MENU_EXECUTOR)
+                .thenAccept(warps -> PlayerWarpsPlugin.get().runSync(() -> {
+                    render(warps);
+                    if (getTemplate().getLayout() != null) setLayout(getPlayer(), this);
+                    sortingCooldowns.remove(player);
+                    getBaseGui().update();
+                }))
+                .exceptionally(throwable -> {
+                    sortingCooldowns.remove(player);
+                    PlayerWarpsPlugin.get().getLogger().log(Level.SEVERE, "Failed to build the warps menu", throwable);
+                    return null;
+                });
 
         paginatedGui.open(player);
     }

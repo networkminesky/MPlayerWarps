@@ -44,7 +44,7 @@ public class Warp implements ConfigurationSerializable {
         for (String key : map.keySet()) {
             final Object value = map.get(key);
             switch (key){
-                case "uuid": warpID = UUID.fromString((String) value);
+                case "uuid": warpID = UUID.fromString((String) value); break;
                 case "name": setName((String) value); break;
                 case "display-name": setDisplayName((String) value); break;
                 case "owner-id": setOwner(UUID.fromString((String) value)); break;
@@ -80,6 +80,12 @@ public class Warp implements ConfigurationSerializable {
             }
         }
 
+        // A display name equal to the warp name means the owner never customized it, so it is
+        // dropped to let getDisplayName() fall back to the name and follow renames.
+        if (Objects.equals(displayName, name)) {
+            displayName = null;
+        }
+
         if (reviewers != null) stars = TextUtil.createRatingFormat(this);
     }
 
@@ -89,7 +95,7 @@ public class Warp implements ConfigurationSerializable {
         return new HashMap<String, Object>() {{
             put("uuid", getWarpID().toString());
             put("name", getName());
-            put("display-name", getDisplayName());
+            put("display-name", getRawDisplayName());
             put("owner-id", getOwner().toString());
             put("loc", getLocation());
             put("lore", getDescription());
@@ -174,11 +180,18 @@ public class Warp implements ConfigurationSerializable {
 
     public void setName(String name) {
         this.name = name;
-        this.displayName = name;
     }
 
     public String getDisplayName() {
         return displayName == null ? name : TextUtil.colorize(displayName);
+    }
+
+    /**
+     * Display name as it was entered by the owner (with &amp; color codes).
+     * Used for serialization so the stored value survives a save/load cycle unchanged.
+     */
+    public String getRawDisplayName() {
+        return displayName == null ? name : displayName;
     }
 
     public void setDisplayName(String displayName) {

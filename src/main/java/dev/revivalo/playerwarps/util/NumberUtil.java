@@ -5,7 +5,12 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 public final class NumberUtil {
-    private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("###,###,###,###");
+    /**
+     * {@link DecimalFormat} is not thread-safe and menus are built off the main thread,
+     * so every thread gets its own instance.
+     */
+    private static final ThreadLocal<DecimalFormat> DECIMAL_FORMAT =
+            ThreadLocal.withInitial(() -> new DecimalFormat("###,###,###,###"));
 
     public static double round(double value, int places) {
         if (places < 0) throw new IllegalArgumentException();
@@ -17,7 +22,7 @@ public final class NumberUtil {
     }
 
     public static String formatNumber(long number) {
-        return DECIMAL_FORMAT.format(number);
+        return DECIMAL_FORMAT.get().format(number);
     }
 
     public static String format(long number) {

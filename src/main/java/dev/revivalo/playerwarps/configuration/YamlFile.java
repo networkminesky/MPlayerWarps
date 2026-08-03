@@ -9,6 +9,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.logging.Level;
 
@@ -73,6 +75,24 @@ public class YamlFile {
 			this.configuration.save(file);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Writes already serialized content to the file. Kept separate from {@link #save()} so the
+	 * write can be performed off the main thread without serializing there too. Synchronized to
+	 * keep two overlapping writes from interleaving.
+	 */
+	public synchronized void write(String contents) {
+		try {
+			final File parent = file.getParentFile();
+			if (parent != null) {
+				parent.mkdirs();
+			}
+
+			Files.writeString(file.toPath(), contents, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			PlayerWarpsPlugin.get().getLogger().log(Level.SEVERE, "Cannot save " + file, e);
 		}
 	}
 

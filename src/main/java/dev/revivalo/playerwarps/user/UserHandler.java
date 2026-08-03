@@ -9,17 +9,18 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class UserHandler implements Listener {
     public UserHandler(PlayerWarpsPlugin plugin) {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
-    public final static HashMap<UUID, User> USERS = new HashMap<>();
+    // Menus are built off the main thread, so this map is read from more than one thread.
+    public final static Map<UUID, User> USERS = new ConcurrentHashMap<>();
 
     public static User createUser(final Player player) {
         return createUser(player, new HashMap<>());

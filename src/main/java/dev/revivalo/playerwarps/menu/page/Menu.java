@@ -21,9 +21,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public abstract class Menu {
-    protected static final ExecutorService MENU_EXECUTOR = Executors.newFixedThreadPool(1);
+    protected static final ExecutorService MENU_EXECUTOR = Executors.newSingleThreadExecutor(runnable -> {
+        final Thread thread = new Thread(runnable, "PlayerWarps-Menu");
+        thread.setDaemon(true);
+        return thread;
+    });
 
     public static final Map<Class<? extends Menu>, MenuTemplate> TEMPLATE_CACHE = new HashMap<>();
+
+    public static void shutdownExecutor() {
+        MENU_EXECUTOR.shutdown();
+    }
 
     public MenuTemplate getTemplate() {
         return TEMPLATE_CACHE.computeIfAbsent(this.getClass(), clazz -> new MenuTemplate(

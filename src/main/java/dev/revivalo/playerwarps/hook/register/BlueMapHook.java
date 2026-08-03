@@ -63,11 +63,17 @@ public class BlueMapHook implements Hook<BlueMapAPI> {
     public void setMarker(Warp warp) {
         if (!warp.isAccessible()) return;
         if (isOn()) {
+            if (markerSet == null) return;
+
+            // Warps in deleted worlds keep a null location - creating a marker for them
+            // would throw and abort the whole warp loading loop.
+            Location warpLocation = warp.getLocation();
+            if (warpLocation == null || warpLocation.getWorld() == null) return;
+
             String markerLabel = Config.DYNMAP_MARKER_LABEL.asString()
                     .replace("%warp%", warp.getName())
                     .replace("%owner%", warp.getOwnerName());
             String markerId = warp.getWarpID().toString();
-            Location warpLocation = warp.getLocation();
             POIMarker marker = POIMarker.builder()
                     .label(markerLabel)
                     .position(warpLocation.getX(), warpLocation.getY(), warpLocation.getZ())
@@ -85,6 +91,8 @@ public class BlueMapHook implements Hook<BlueMapAPI> {
 
     public void removeMarker(Warp warp) {
         if (isOn()) {
+            if (markerSet == null) return;
+
             markerSet.getMarkers().remove(warp.getWarpID().toString());
         }
     }

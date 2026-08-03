@@ -66,12 +66,18 @@ public class DynmapHook implements Hook<DynmapAPI> {
     public void setMarker(Warp warp) {
         if (!warp.isAccessible()) return;
         if (isOn()) {
+            if (markerSet == null) return;
+
+            // Warps in deleted worlds keep a null location - creating a marker for them
+            // would throw and abort the whole warp loading loop.
+            Location location = warp.getLocation();
+            if (location == null || location.getWorld() == null) return;
+
             String markerId = warp.getWarpID().toString();
             String markerLabel = Config.DYNMAP_MARKER_LABEL.asString()
                     .replace("%warp%", warp.getName())
                     .replace("%owner%", warp.getOwnerName());
 
-            Location location = warp.getLocation();
             Marker marker = markerSet.createMarker(
                     markerId,
                     markerLabel,
@@ -89,6 +95,8 @@ public class DynmapHook implements Hook<DynmapAPI> {
 
     public void removeMarker(Warp warp) {
         if (isOn()) {
+            if (markerSet == null) return;
+
             String markerId = warp.getWarpID().toString();
 
             Marker marker = markerSet.findMarker(markerId);

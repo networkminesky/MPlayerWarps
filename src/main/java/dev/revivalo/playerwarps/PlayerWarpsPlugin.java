@@ -6,6 +6,7 @@ import dev.revivalo.playerwarps.configuration.Data;
 import dev.revivalo.playerwarps.configuration.file.Config;
 import dev.revivalo.playerwarps.hook.HookRegister;
 import dev.revivalo.playerwarps.menu.MenuRegister;
+import dev.revivalo.playerwarps.menu.page.Menu;
 import dev.revivalo.playerwarps.updatechecker.UpdateChecker;
 import dev.revivalo.playerwarps.updatechecker.UpdateNotificator;
 import dev.revivalo.playerwarps.user.UserHandler;
@@ -62,9 +63,14 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
         new UserHandler(this);
 
         setWarpHandler(new WarpManager());
-        setDataManager(new Data());
 
+        // Both have to run before data.yml is read: constructing Data parses the file, which
+        // deserializes every Warp, and Warp resolves its category through CategoryManager.
+        // Categories in turn may use items provided by hooks (ItemsAdder, Oraxen, HeadDatabase).
         HookRegister.hook();
+        CategoryManager.loadCategories();
+
+        setDataManager(new Data());
 
         if (Config.UPDATE_CHECKER.asBoolean()) {
             new UpdateChecker(this, 79089).getVersion(pluginVersion -> {
@@ -91,20 +97,20 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
             });
         }
 
-        CategoryManager.loadCategories();
-
         registerCommands();
 
         warpHandler.loadWarps();
 
         if (Config.AUTOSAVE_ENABLED.asBoolean()) {
             long intervalInTicks = (Config.AUTOSAVE_INTERVAL.asLong() * 60) * 20;
+            // Runs synchronously on purpose - saveWarps() serializes on the calling thread and
+            // offloads only the file write.
             new BukkitRunnable() {
                 @Override
                 public void run() {
                     warpHandler.saveWarps();
                 }
-            }.runTaskTimerAsynchronously(this, intervalInTicks, intervalInTicks);
+            }.runTaskTimer(this, intervalInTicks, intervalInTicks);
         }
 
         MenuRegister.registerFiles();
@@ -113,7 +119,11 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
     }
 
     @Override
-    public void onDisable() {warpHandler.saveWarps();}
+    public void onDisable() {
+        // The scheduler is already gone at this point, so the write must not be offloaded.
+        warpHandler.saveWarps(false);
+        Menu.shutdownExecutor();
+    }
 
     private void registerCommands(){
         new PwarpMainCommand().registerMainCommand(this, "pwarp");

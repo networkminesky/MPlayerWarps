@@ -17,7 +17,12 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.*;
 
 public class TeleportToWarpAction implements WarpAction<String> {
-    private final static Set<UUID> uuids = new HashSet<>();
+    /**
+     * Players who were warned that a warp location is unsafe. Repeating the teleport to the
+     * same warp within the timeout forces it through, as the warning message advertises.
+     */
+    private final static Map<UUID, UnsafeConfirmation> unsafeConfirmations = new HashMap<>();
+    private final static long UNSAFE_CONFIRMATION_TIMEOUT = 15_000L;
 
     private final int fee;
 
@@ -49,15 +54,14 @@ public class TeleportToWarpAction implements WarpAction<String> {
         }
 
         Teleport teleport = new Teleport(player, warp.getLocation());
-        if (!uuids.contains(player.getUniqueId())) {
-            if (!teleport.isSafe()) {
-                uuids.add(player.getUniqueId());
-                player.sendMessage(Lang.TELEPORTATION_UNSAFE.asColoredString());
-                return false;
-            }
-        } else {
-            uuids.remove(player.getUniqueId());
+        if (Config.CHECK_FOR_SAFE_TELEPORT.asBoolean() && !teleport.isSafe() && !hasConfirmedUnsafe(player, warp)) {
+            unsafeConfirmations.put(player.getUniqueId(),
+                    new UnsafeConfirmation(warp.getWarpID(), System.currentTimeMillis() + UNSAFE_CONFIRMATION_TIMEOUT));
+            player.sendMessage(Lang.TELEPORTATION_UNSAFE.asColoredString());
+            return false;
         }
+
+        unsafeConfirmations.remove(player.getUniqueId());
 
         teleport.proceed();
 
@@ -109,6 +113,23 @@ public class TeleportToWarpAction implements WarpAction<String> {
         }.runTaskTimer(PlayerWarpsPlugin.get(), 2, 2);
 
         return true;
+    }
+
+    private static boolean hasConfirmedUnsafe(Player player, Warp warp) {
+        final UnsafeConfirmation confirmation = unsafeConfirmations.get(player.getUniqueId());
+        if (confirmation == null) {
+            return false;
+        }
+
+        if (confirmation.expiresAt() < System.currentTimeMillis()) {
+            unsafeConfirmations.remove(player.getUniqueId());
+            return false;
+        }
+
+        return Objects.equals(confirmation.warpID(), warp.getWarpID());
+    }
+
+    private record UnsafeConfirmation(UUID warpID, long expiresAt) {
     }
 
     @Override

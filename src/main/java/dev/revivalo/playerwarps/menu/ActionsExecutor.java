@@ -69,7 +69,7 @@ public class ActionsExecutor {
                     }
                 }
 
-                final BaseGui gui = menu.getBaseGui();
+                final BaseGui gui = menu == null ? null : menu.getBaseGui();
                 String lineWithPlaceholders = TextUtil.applyPlaceholdersToString(player, line);
                 String coloredLine = TextUtil.colorize(lineWithPlaceholders);
 
@@ -81,8 +81,8 @@ public class ActionsExecutor {
                         player.performCommand(lineWithPlaceholders);
                         break;
                     case SORT:
-                        WarpsMenu warpsMenu = (WarpsMenu) menu;
-                        ((WarpsMenu) menu).getPaginatedGui().clearPageItems();
+                        if (!(menu instanceof WarpsMenu warpsMenu)) break;
+                        warpsMenu.getPaginatedGui().clearPageItems();
                         warpsMenu.open(player, warpsMenu.getCategoryName(), menu.getNextSortType(warpsMenu.getSortType()), warpsMenu.getFoundWarps());
                         break;
                     case NEXT_PAGE:

@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.*;
+import java.util.logging.Level;
 
 public class CategoryManager {
     private static HashMap<String, Category> categoriesMap;
@@ -40,13 +41,33 @@ public class CategoryManager {
         setCategoriesMap(categories);
 
         if (getDefaultCategory().isEmpty()) {
-            Category category = categories.get("all");
-            category.setDefaultCategory(true);
+            // Keys are stored uppercased, so the fallback has to be looked up that way.
+            Category fallback = categories.get("ALL");
+            if (fallback == null) {
+                fallback = categories.values().stream().findFirst().orElse(null);
+            }
+
+            if (fallback == null) {
+                PlayerWarpsPlugin.get().getLogger().log(Level.WARNING,
+                        "No categories are defined in categories.yml, the warps menu will be empty.");
+            } else {
+                fallback.setDefaultCategory(true);
+            }
         }
     }
 
     public static Category getCategoryFromName(String categoryName) {
-        return categoriesMap.get((categoryName != null ? categoryName : "all").toUpperCase(Locale.ENGLISH));
+        if (categoriesMap == null) {
+            PlayerWarpsPlugin.get().getLogger().log(Level.WARNING,
+                    "Category '" + categoryName + "' was requested before categories.yml was loaded.");
+            return null;
+        }
+
+        final Category category = categoriesMap.get((categoryName != null ? categoryName : "all").toUpperCase(Locale.ENGLISH));
+
+        // A warp can reference a category that has since been removed from categories.yml.
+        // Falling back keeps getCategory() non-null instead of failing the whole warp.
+        return category != null ? category : getDefaultCategory().orElse(null);
     }
 
     public static Optional<Category> getDefaultCategory() {
