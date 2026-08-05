@@ -19,6 +19,10 @@
 config:
   debug: false
   language: English
+  # How players type values in (warp name, description, password, ...)
+  # CHAT - the player writes the value into chat
+  # SIGN - the player writes the value into a sign GUI
+  input-mode: CHAT
   update-checker: true
   autosave-enabled: true # recommended setting to true
   autosave-announce: true

@@ -184,7 +184,7 @@ lang:
     - "&7Owner: &f%owner-name%"
     - "&7Created: &f%creationDate%"
     - "&7World: &f%world%"
-    - "&7Visits: &f%visits% &8(%today% today)"
+    - "&7Visits: &f%visits% &8(%today% today, %unique_visits% unique)"
     - "&7Ratings: &e%stars% &6%ratings% &8(%voters% voters)"
     - "&7Status: %status%"
     - "&7Price: &6%price%"
@@ -196,7 +196,7 @@ lang:
     - "&e► Right click to review"
   own-warp-lore:
     - " "
-    - "&7Visits: &f%visits% &8(%today% today)"
+    - "&7Visits: &f%visits% &8(%today% today, %unique_visits% unique)"
     - "&7Created: &f%creationDate%"
     - "&7Ratings: &e%stars% &6%ratings% &8(%voters% voters)"
     - "&7Availability: %status%"

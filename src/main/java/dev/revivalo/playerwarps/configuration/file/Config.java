@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 public enum Config {
     LANGUAGE,
+    INPUT_MODE,
     WARP_NAME_FORMAT,
     DYNMAP_HOOK_ENABLED,
     BLUEMAP_HOOK_ENABLED,

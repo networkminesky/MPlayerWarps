@@ -1,6 +1,8 @@
 package dev.revivalo.playerwarps.util;
 
 import dev.revivalo.playerwarps.PlayerWarpsPlugin;
+import dev.revivalo.playerwarps.hook.HookRegister;
+import dev.revivalo.playerwarps.hook.register.PlaceholderApiHook;
 import dev.revivalo.playerwarps.menu.ActionType;
 import dev.revivalo.playerwarps.menu.ClickAction;
 import dev.revivalo.playerwarps.warp.Warp;
@@ -273,15 +275,24 @@ public final class TextUtil {
         return newLore;
     }
 
+    /**
+     * Resolves PlaceholderAPI placeholders. Has to be called from the main thread, as third
+     * party expansions are not required to be thread-safe.
+     */
     public static String applyPlaceholdersToString(Player player, String text) {
-        return /*HookRegister.isHookEnabled(HookRegister.getPlaceholderApiHook()) && PlaceholderAPI.containsPlaceholders(text)
-                ? PlaceholderAPI.setPlaceholders(player, text) :*/ text;
+        if (player == null || text == null) {
+            return text;
+        }
+
+        return HookRegister.mapIfEnabled(PlaceholderApiHook.class, hook -> hook.setPlaceholders(player, text), text);
     }
 
     public static List<String> applyPlaceholdersToList(Player player, List<String> list) {
-        /*if (HookRegister.isHookEnabled(HookRegister.getPlaceholderApiHook())) {
-            return PlaceholderAPI.setPlaceholders(player, list);
-        } else return*/ return list;
+        if (player == null || list == null) {
+            return list;
+        }
+
+        return HookRegister.mapIfEnabled(PlaceholderApiHook.class, hook -> hook.setPlaceholders(player, list), list);
     }
 
     public static List<ClickAction> findAndReturnActions(@Nullable List<String> actions) {

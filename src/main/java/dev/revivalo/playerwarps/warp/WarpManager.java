@@ -8,34 +8,21 @@ import dev.revivalo.playerwarps.configuration.file.Config;
 import dev.revivalo.playerwarps.configuration.file.Lang;
 import dev.revivalo.playerwarps.hook.register.BlueMapHook;
 import dev.revivalo.playerwarps.hook.register.DynmapHook;
-import dev.revivalo.playerwarps.menu.page.ManageMenu;
 import dev.revivalo.playerwarps.hook.HookRegister;
 import dev.revivalo.playerwarps.menu.sort.*;
 import dev.revivalo.playerwarps.playerconfig.PlayerConfig;
 import dev.revivalo.playerwarps.util.PermissionUtil;
-import dev.revivalo.playerwarps.warp.action.WarpAction;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 public class WarpManager {
@@ -165,60 +152,6 @@ public class WarpManager {
             }
         }
         return owned;
-    }
-
-    public CompletableFuture<String> waitForPlayerInput(Player player, Warp warp, WarpAction<?> warpAction) {
-        CompletableFuture<String> future = new CompletableFuture<>();
-
-        player.closeInventory();
-        player.sendMessage(warpAction.getMessage().asColoredString().replace("%warp%", warp.getName()));
-
-        BaseComponent[] msg = TextComponent.fromLegacyText(Lang.CANCEL_INPUT.asColoredString());
-        for (BaseComponent bc : msg) {
-            bc.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, TextComponent.fromLegacyText(Lang.CLICK_TO_CANCEL_INPUT.asColoredString())));
-            bc.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pwcancel"));
-        }
-
-        player.spigot().sendMessage(msg);
-
-        Listener listener = new Listener() {
-            @EventHandler
-            public void onPlayerChat(AsyncPlayerChatEvent event) {
-                if (event.getPlayer().equals(player)) {
-                    event.setCancelled(true);
-                    future.complete(event.getMessage());
-                    PlayerWarpsPlugin.get().runSync(() -> {
-                        if (!warpAction.hasFee()) new ManageMenu(warp).openFor(player);
-                    });
-                    HandlerList.unregisterAll(this);
-                }
-            }
-
-            @EventHandler
-            public void onChat(final PlayerCommandPreprocessEvent event) {
-                if (!event.getPlayer().equals(player))
-                    return;
-
-                if (event.getMessage().equalsIgnoreCase("/pwcancel")) {
-                    event.setCancelled(true);
-                    HandlerList.unregisterAll(this);
-                    player.sendMessage(Lang.INPUT_CANCELLED.asColoredString());
-                }
-            }
-        };
-
-        Bukkit.getPluginManager().registerEvents(listener, PlayerWarpsPlugin.get());
-
-        Bukkit.getScheduler().runTaskLater(PlayerWarpsPlugin.get(), () -> {
-            if (!future.isDone()) {
-                future.completeExceptionally(new TimeoutException("Player did not respond in time"));
-                PlayerWarpsPlugin.get().getLogger().info("Not responded");
-                HandlerList.unregisterAll(listener);
-            }
-        }, 15 * 20);
-
-
-        return future;
     }
 
     public int getCountOfWarps(Category category) {

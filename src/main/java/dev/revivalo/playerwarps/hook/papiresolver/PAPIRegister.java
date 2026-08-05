@@ -15,6 +15,7 @@ public class PAPIRegister extends PlaceholderExpansion {
 
     private void registerDefaultResolvers() {
         registerResolver(new TotalWarpsResolver());
+        registerResolver(new WarpVisitsResolver());
         //registerResolver(new MostVisitedWarpsResolver());
     }
 

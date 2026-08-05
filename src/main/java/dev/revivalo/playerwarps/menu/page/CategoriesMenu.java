@@ -61,6 +61,7 @@ public class CategoriesMenu extends Menu {
 //                                                ? Lang.NO_DESCRIPTION.asColoredString()
 //                                                : TextUtil.splitLoreIntoLines(warp.getDescription(), 5));
                                 put("%visits%", String.valueOf(warp.getVisits()));
+                                put("%unique_visits%", String.valueOf(warp.getUniqueVisits()));
                                 put("%owner-name%", warp.getOwnerName());
                             }}
                     );

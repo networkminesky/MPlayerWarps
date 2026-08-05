@@ -1,8 +1,8 @@
 package dev.revivalo.playerwarps.menu;
 
 import dev.revivalo.playerwarps.PlayerWarpsPlugin;
+import dev.revivalo.playerwarps.input.PlayerInput;
 import dev.revivalo.playerwarps.menu.page.CategoriesMenu;
-import dev.revivalo.playerwarps.menu.page.InputMenu;
 import dev.revivalo.playerwarps.menu.page.Menu;
 import dev.revivalo.playerwarps.menu.page.WarpsMenu;
 import dev.revivalo.playerwarps.util.TextUtil;
@@ -98,9 +98,9 @@ public class ActionsExecutor {
                         paginatedGui.updateTitle(menu.getTemplate().getTitle().replace("%page%", String.valueOf(paginatedGui.getCurrentPageNum())));
                         break;
                     case SEARCH:
-                        new InputMenu(null)
-                                .setWarpAction(new SearchWarpAction())
-                                .openFor(player);
+                        final SearchWarpAction searchAction = new SearchWarpAction();
+                        PlayerInput.request(player, null, searchAction)
+                                .thenAccept(input -> searchAction.proceed(player, null, input));
                         break;
                     case OPEN:
 //                        if (Config.ENABLE_CATEGORIES.asBoolean()) {

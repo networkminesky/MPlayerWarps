@@ -259,14 +259,17 @@ public enum Lang {
         return TextUtil.colorize(TextUtil.replaceList(lists.get(this.name()), definitions));
     }
 
+    // The player aware overloads additionally resolve PlaceholderAPI placeholders. Colorizing
+    // happens last so that color codes returned by an expansion are translated as well.
     public List<String> asReplacedList(Player player, final Map<String, String> definitions) {
-        return TextUtil.colorize(TextUtil.replaceList(lists.get(this.name()), definitions));
+        return TextUtil.colorize(
+                TextUtil.applyPlaceholdersToList(player, TextUtil.replaceList(lists.get(this.name()), definitions)));
     }
 
     public String asColoredString() {return asColoredString(null);}
 
     public String asColoredString(Player player) {
-        return TextUtil.colorize(messages.get(this.name()));
+        return TextUtil.colorize(TextUtil.applyPlaceholdersToString(player, messages.get(this.name())));
     }
 
     public String asReplacedString(Map<String, String> definitions) {
@@ -274,6 +277,7 @@ public enum Lang {
     }
 
     public String asReplacedString(Player player, Map<String, String> definitions) {
-        return TextUtil.colorize(TextUtil.replaceString(messages.get(this.name()), definitions));
+        return TextUtil.colorize(
+                TextUtil.applyPlaceholdersToString(player, TextUtil.replaceString(messages.get(this.name()), definitions)));
     }
 }

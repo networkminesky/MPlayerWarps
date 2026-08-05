@@ -36,6 +36,7 @@ public class Warp implements ConfigurationSerializable {
     private long lastActivity;
     private long featuredTimestamp;
     private Set<UUID> reviewers;
+    private Set<UUID> uniqueVisitors = new HashSet<>();
     private Set<UUID> blockedPlayers = new HashSet<>();
     private Category category;
     private ItemStack menuItem;
@@ -63,6 +64,7 @@ public class Warp implements ConfigurationSerializable {
                 case "ratings": setRating((int) value); break;
                 case "reviewers": setReviewers(((List<String>) value).stream().map(UUID::fromString).collect(Collectors.toCollection(HashSet::new))); break;
                 case "blocked-players": setBlockedPlayers(((List<String>) value).stream().map(UUID::fromString).collect(Collectors.toCollection(HashSet::new))); break;
+                case "unique-visitors": setUniqueVisitors(((List<String>) value).stream().map(UUID::fromString).collect(Collectors.toCollection(HashSet::new))); break;
                 case "visits": setVisits((int) value); break;
                 case "status": setStatus(WarpStatus.valueOf((String) value)); break;
                 case "password": setPassword(String.valueOf(value)); break;
@@ -104,6 +106,7 @@ public class Warp implements ConfigurationSerializable {
             put("need-verification", isVerificationNeeded());
             put("reviewers", getReviewers().stream().map(UUID::toString).collect(Collectors.toList()));
             put("blocked-players", getBlockedPlayers().stream().map(UUID::toString).collect(Collectors.toList()));
+            put("unique-visitors", getUniqueVisitors().stream().map(UUID::toString).collect(Collectors.toList()));
             put("category", getCategory() == null ? "all" : getCategory().getType());
             put("password", getPassword());
             put("visits", getVisits());
@@ -272,6 +275,32 @@ public class Warp implements ConfigurationSerializable {
 
     public void setVisits(int visits) {
         this.visits = visits;
+    }
+
+    public Set<UUID> getUniqueVisitors() {
+        return uniqueVisitors == null ? Collections.emptySet() : uniqueVisitors;
+    }
+
+    public void setUniqueVisitors(Set<UUID> uniqueVisitors) {
+        this.uniqueVisitors = uniqueVisitors;
+    }
+
+    /**
+     * Number of distinct players that have visited this warp.
+     */
+    public int getUniqueVisits() {
+        return getUniqueVisitors().size();
+    }
+
+    /**
+     * Records a visitor. Returns true if this was their first visit of this warp.
+     */
+    public boolean addUniqueVisitor(UUID playerUuid) {
+        if (uniqueVisitors == null) {
+            uniqueVisitors = new HashSet<>();
+        }
+
+        return uniqueVisitors.add(playerUuid);
     }
 
     public int getTodayVisits() {

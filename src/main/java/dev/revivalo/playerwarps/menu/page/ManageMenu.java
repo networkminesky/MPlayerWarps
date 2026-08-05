@@ -3,6 +3,7 @@ package dev.revivalo.playerwarps.menu.page;
 import dev.revivalo.playerwarps.PlayerWarpsPlugin;
 import dev.revivalo.playerwarps.configuration.file.Config;
 import dev.revivalo.playerwarps.configuration.file.Lang;
+import dev.revivalo.playerwarps.input.PlayerInput;
 import dev.revivalo.playerwarps.menu.ActionsExecutor;
 import dev.revivalo.playerwarps.menu.MenuItem;
 import dev.revivalo.playerwarps.util.DateUtil;
@@ -50,15 +51,8 @@ public class ManageMenu extends Menu {
                                 if (!item.hasAction()) return;
                                 final WarpAction<?> action = item.getAction();
                                 if (action.hasInput()) {
-                                    PlayerWarpsPlugin.getWarpHandler().waitForPlayerInput(
-                                            player,
-                                            warp,
-                                            action
-                                    ).thenAccept(input -> {
-                                        PlayerWarpsPlugin.get().runSync(() -> {
-                                            proceedAction(player, warp, input, item.getAction());
-                                        });
-                                    });
+                                    PlayerInput.request(player, warp, action)
+                                            .thenAccept(input -> proceedAction(player, warp, input, item.getAction()));
                                 } else if (action.hasToBeConfirmed()) {
                                     openConfirmationMenu(player, warp, item.getAction());
                                 } else if (action instanceof OpenCategorySelection) {
@@ -95,6 +89,7 @@ public class ManageMenu extends Menu {
                 ? Lang.NO_DESCRIPTION.asColoredString()
                 : warp.getDescription());
         placeholders.put("%visits%", String.valueOf(warp.getVisits()));
+        placeholders.put("%unique_visits%", String.valueOf(warp.getUniqueVisits()));
         placeholders.put("%owner-name%", warp.getOwnerName());
         placeholders.put("%feature-price%", Config.FEATURE_WARP_FEE.asString());
         return placeholders;

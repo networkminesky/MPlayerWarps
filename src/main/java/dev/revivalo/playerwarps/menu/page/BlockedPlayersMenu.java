@@ -3,6 +3,7 @@ package dev.revivalo.playerwarps.menu.page;
 import dev.revivalo.playerwarps.PlayerWarpsPlugin;
 import dev.revivalo.playerwarps.configuration.file.Config;
 import dev.revivalo.playerwarps.configuration.file.Lang;
+import dev.revivalo.playerwarps.input.PlayerInput;
 import dev.revivalo.playerwarps.util.ItemUtil;
 import dev.revivalo.playerwarps.warp.Warp;
 import dev.revivalo.playerwarps.warp.action.BlockPlayerAction;
@@ -51,8 +52,7 @@ public class BlockedPlayersMenu extends Menu {
                 .setName(Lang.BLOCKED_PLAYER_ADD.asColoredString())
                 .asGuiItem(event -> {
                     BlockPlayerAction blockPlayerAction = new BlockPlayerAction();
-                    PlayerWarpsPlugin.getWarpHandler()
-                            .waitForPlayerInput(player, warp, blockPlayerAction)
+                    PlayerInput.request(player, warp, blockPlayerAction)
                             .thenAccept(input -> blockPlayerAction.proceed(player, warp, input, new BlockedPlayersMenu(warp)));
                 }));
 

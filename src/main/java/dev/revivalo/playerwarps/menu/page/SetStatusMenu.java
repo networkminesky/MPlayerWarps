@@ -2,6 +2,7 @@ package dev.revivalo.playerwarps.menu.page;
 
 import dev.revivalo.playerwarps.PlayerWarpsPlugin;
 import dev.revivalo.playerwarps.configuration.file.Lang;
+import dev.revivalo.playerwarps.input.PlayerInput;
 import dev.revivalo.playerwarps.warp.Warp;
 import dev.revivalo.playerwarps.warp.WarpStatus;
 import dev.revivalo.playerwarps.warp.action.SetPasswordAction;
@@ -40,11 +41,9 @@ public class SetStatusMenu extends Menu {
             new SetStatusAction().proceed(player, warp, WarpStatus.OPENED);
         }));
         gui.setItem(14, ItemBuilder.from(Material.IRON_DOOR).setName(Lang.PASSWORD_PROTECTED_STATUS.asColoredString()).asGuiItem(event -> {
-            PlayerWarpsPlugin.get().runSync(() -> {
-                new InputMenu(warp)
-                        .setWarpAction(new SetPasswordAction())
-                        .openFor(player);
-            });
+            final SetPasswordAction setPasswordAction = new SetPasswordAction();
+            PlayerInput.request(player, warp, setPasswordAction)
+                    .thenAccept(input -> setPasswordAction.proceed(player, warp, input));
         }));
     }
 
