@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public enum Config {
+    DEBUG,
     LANGUAGE,
     INPUT_MODE,
     WARP_NAME_FORMAT,

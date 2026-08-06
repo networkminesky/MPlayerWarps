@@ -51,7 +51,7 @@ public class ManageMenu extends Menu {
                                 if (!item.hasAction()) return;
                                 final WarpAction<?> action = item.getAction();
                                 if (action.hasInput()) {
-                                    PlayerInput.request(player, warp, action)
+                                    PlayerInput.request(player, warp, action, new ManageMenu(warp))
                                             .thenAccept(input -> proceedAction(player, warp, input, item.getAction()));
                                 } else if (action.hasToBeConfirmed()) {
                                     openConfirmationMenu(player, warp, item.getAction());

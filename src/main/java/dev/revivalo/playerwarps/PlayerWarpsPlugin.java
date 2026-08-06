@@ -5,6 +5,9 @@ import dev.revivalo.playerwarps.commandmanager.command.PwarpMainCommand;
 import dev.revivalo.playerwarps.configuration.Data;
 import dev.revivalo.playerwarps.configuration.file.Config;
 import dev.revivalo.playerwarps.hook.HookRegister;
+import dev.revivalo.playerwarps.input.InputMode;
+import dev.revivalo.playerwarps.input.ModalInput;
+import dev.revivalo.playerwarps.input.PlayerInput;
 import dev.revivalo.playerwarps.menu.MenuRegister;
 import dev.revivalo.playerwarps.menu.page.Menu;
 import dev.revivalo.playerwarps.updatechecker.UpdateChecker;
@@ -115,6 +118,8 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
 
         MenuRegister.registerFiles();
 
+        logInputMode();
+
         new UpdateNotificator();
     }
 
@@ -123,6 +128,22 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
         // The scheduler is already gone at this point, so the write must not be offloaded.
         warpHandler.saveWarps(false);
         Menu.shutdownExecutor();
+    }
+
+    /**
+     * Reports the input mode actually in use on startup - a missing or misspelled option
+     * silently degrades to chat otherwise.
+     */
+    private void logInputMode() {
+        final String configured = Config.INPUT_MODE.asString();
+        final InputMode mode = PlayerInput.getMode();
+
+        getLogger().info(String.format("Input mode: %s (config.yml: %s)",
+                mode, configured == null ? "not set" : configured));
+
+        if (mode == InputMode.MODAL && !ModalInput.isAvailable()) {
+            getLogger().warning("Input mode MODAL is not usable on this server, chat input will be used.");
+        }
     }
 
     private void registerCommands(){

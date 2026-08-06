@@ -50,6 +50,7 @@ public class UserHandler implements Listener {
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
     public void onJoin(final PlayerJoinEvent event) {
         UserHandler.createUser(event.getPlayer());
+        PlayerWarpsPlugin.getWarpHandler().refreshOwnerNames(event.getPlayer());
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)

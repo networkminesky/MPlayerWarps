@@ -154,6 +154,20 @@ public class WarpManager {
         return owned;
     }
 
+    /**
+     * Stores the current name on every warp the player owns. The server's user cache expires,
+     * so this keeps "Unknown" owners (and searching by owner) working across restarts.
+     */
+    public void refreshOwnerNames(final Player owner) {
+        final String name = owner.getName();
+
+        for (Warp warp : warps) {
+            if (Objects.equals(warp.getOwner(), owner.getUniqueId()) && !name.equals(warp.getOwnerName())) {
+                warp.setOwnerName(name);
+            }
+        }
+    }
+
     public int getCountOfWarps(Category category) {
         final String categoryName = category.getType();
         return (int) warps.stream()

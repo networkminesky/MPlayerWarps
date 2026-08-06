@@ -28,6 +28,13 @@ public class SetStatusMenu extends Menu {
                 .create();
 
         gui.setDefaultClickAction(event -> {
+            // Slots that carry an item handle their own click. Without this guard the manage menu
+            // would reopen on top of whatever the item just opened - the password prompt, the
+            // dialog window or the confirmation menu.
+            if (gui.getGuiItems().containsKey(event.getRawSlot())) {
+                return;
+            }
+
             PlayerWarpsPlugin.get().runSync(() -> new ManageMenu(warp).openFor(player));
         });
     }
@@ -42,7 +49,7 @@ public class SetStatusMenu extends Menu {
         }));
         gui.setItem(14, ItemBuilder.from(Material.IRON_DOOR).setName(Lang.PASSWORD_PROTECTED_STATUS.asColoredString()).asGuiItem(event -> {
             final SetPasswordAction setPasswordAction = new SetPasswordAction();
-            PlayerInput.request(player, warp, setPasswordAction)
+            PlayerInput.request(player, warp, setPasswordAction, new SetStatusMenu(warp))
                     .thenAccept(input -> setPasswordAction.proceed(player, warp, input));
         }));
     }

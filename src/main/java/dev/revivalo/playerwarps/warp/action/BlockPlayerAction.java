@@ -1,29 +1,44 @@
 package dev.revivalo.playerwarps.warp.action;
 
-import dev.revivalo.playerwarps.configuration.file.Config;
 import dev.revivalo.playerwarps.configuration.file.Lang;
 import dev.revivalo.playerwarps.util.PermissionUtil;
-import dev.revivalo.playerwarps.util.TextUtil;
+import dev.revivalo.playerwarps.util.PlayerUtil;
 import dev.revivalo.playerwarps.warp.Warp;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import java.util.HashMap;
+import java.util.Objects;
 
 public class BlockPlayerAction implements WarpAction<String> {
     @Override
-    public boolean execute(Player player, Warp warp, String text) {
-        int textLength = TextUtil.removeColors(text).length();
-        if (textLength < 3 || textLength > 32) {
-            player.sendMessage(Lang.TEXT_SIZE_ERROR.asColoredString());
+    public boolean execute(Player player, Warp warp, String playerToBlockName) {
+        if (playerToBlockName == null || playerToBlockName.trim().isEmpty()) {
+            player.sendMessage(Lang.INVALID_INPUT.asColoredString());
             return false;
         }
 
-        warp.setDisplayName(text);
+        final OfflinePlayer playerToBlock = PlayerUtil.getOfflinePlayer(playerToBlockName.trim());
+        if (playerToBlock.getName() == null || (!playerToBlock.hasPlayedBefore() && !playerToBlock.isOnline())) {
+            player.sendMessage(Lang.UNAVAILABLE_PLAYER.asColoredString());
+            return false;
+        }
 
-        player.sendMessage(Lang.DISPLAY_NAME_CHANGED.asReplacedString(player, new HashMap<String, String>() {{
-            put("%warp%", warp.getName());
-            put("%displayName%", warp.getDisplayName());
-        }}));
+        if (Objects.equals(playerToBlock.getUniqueId(), player.getUniqueId())) {
+            player.sendMessage(Lang.CANT_BLOCK_YOURSELF.asColoredString());
+            return false;
+        }
+
+        if (warp.isBlocked(playerToBlock)) {
+            player.sendMessage(Lang.PLAYER_ALREADY_BLOCKED.asColoredString()
+                    .replace("%player%", playerToBlock.getName()));
+            return false;
+        }
+
+        warp.block(playerToBlock);
+
+        player.sendMessage(Lang.PLAYER_BLOCKED.asColoredString()
+                .replace("%warp%", warp.getName())
+                .replace("%player%", playerToBlock.getName()));
 
         return true;
     }
@@ -35,16 +50,11 @@ public class BlockPlayerAction implements WarpAction<String> {
 
     @Override
     public PermissionUtil.Permission getPermission() {
-        return PermissionUtil.Permission.CHANGE_DISPLAY_NAME;
+        return PermissionUtil.Permission.BLOCK_PLAYER;
     }
 
     @Override
     public Lang getMessage() {
-        return Lang.WRITE_NEW_DISPLAY_NAME;
-    }
-
-    @Override
-    public int getFee() {
-        return Config.SET_DISPLAY_NAME_FEE.asInteger();
+        return Lang.BLOCKED_PLAYER_INPUT;
     }
 }

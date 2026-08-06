@@ -99,7 +99,7 @@ public class ActionsExecutor {
                         break;
                     case SEARCH:
                         final SearchWarpAction searchAction = new SearchWarpAction();
-                        PlayerInput.request(player, null, searchAction)
+                        PlayerInput.request(player, null, searchAction, menu)
                                 .thenAccept(input -> searchAction.proceed(player, null, input));
                         break;
                     case OPEN:

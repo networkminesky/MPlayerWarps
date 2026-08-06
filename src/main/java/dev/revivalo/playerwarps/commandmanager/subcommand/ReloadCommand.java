@@ -4,6 +4,8 @@ import dev.revivalo.playerwarps.PlayerWarpsPlugin;
 import dev.revivalo.playerwarps.category.CategoryManager;
 import dev.revivalo.playerwarps.commandmanager.SubCommand;
 import dev.revivalo.playerwarps.configuration.file.Config;
+import dev.revivalo.playerwarps.input.InputMode;
+import dev.revivalo.playerwarps.input.PlayerInput;
 import dev.revivalo.playerwarps.menu.MenuTemplate;
 import dev.revivalo.playerwarps.menu.page.Menu;
 import dev.revivalo.playerwarps.util.PermissionUtil;
@@ -43,5 +45,9 @@ public class ReloadCommand implements SubCommand {
         Config.reload();
         PlayerWarpsPlugin.getWarpHandler().reloadWarps(sender);
         Menu.TEMPLATE_CACHE.values().forEach(MenuTemplate::reload);
+
+        // The config may have been fixed, so let a bad input-mode be reported again.
+        InputMode.resetWarning();
+        sender.sendMessage("§8[§bPlayerWarps§8] §7Input mode: §f" + PlayerInput.getMode());
     }
 }

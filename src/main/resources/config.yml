@@ -20,8 +20,10 @@ config:
   debug: false
   language: English
   # How players type values in (warp name, description, password, ...)
-  # CHAT - the player writes the value into chat
-  # SIGN - the player writes the value into a sign GUI
+  # CHAT  - the player writes the value into chat
+  # SIGN  - the player writes the value into a sign GUI
+  # MODAL - the player writes the value into a dialog window
+  #         (needs Minecraft 1.21.6+ and Paper/a Paper fork, otherwise CHAT is used)
   input-mode: CHAT
   update-checker: true
   autosave-enabled: true # recommended setting to true

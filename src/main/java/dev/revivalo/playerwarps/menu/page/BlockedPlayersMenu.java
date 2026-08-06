@@ -52,7 +52,7 @@ public class BlockedPlayersMenu extends Menu {
                 .setName(Lang.BLOCKED_PLAYER_ADD.asColoredString())
                 .asGuiItem(event -> {
                     BlockPlayerAction blockPlayerAction = new BlockPlayerAction();
-                    PlayerInput.request(player, warp, blockPlayerAction)
+                    PlayerInput.request(player, warp, blockPlayerAction, new BlockedPlayersMenu(warp))
                             .thenAccept(input -> blockPlayerAction.proceed(player, warp, input, new BlockedPlayersMenu(warp)));
                 }));
 

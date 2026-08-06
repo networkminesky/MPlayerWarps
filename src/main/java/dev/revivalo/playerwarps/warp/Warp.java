@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Warp implements ConfigurationSerializable {
+    public static final String UNKNOWN_OWNER = "Unknown";
+
     private UUID warpID;
     private UUID owner;
     private String ownerName;
@@ -49,6 +51,7 @@ public class Warp implements ConfigurationSerializable {
                 case "name": setName((String) value); break;
                 case "display-name": setDisplayName((String) value); break;
                 case "owner-id": setOwner(UUID.fromString((String) value)); break;
+                case "owner-name": setOwnerName((String) value); break;
                 case "need-verification": setVerificationNeeded((boolean) value); break;
                 case "loc": setLocation((Location) value); break;
                 case "lore": setDescription((String) value); break;
@@ -74,12 +77,13 @@ public class Warp implements ConfigurationSerializable {
                 case "featured": setFeaturedTimestamp(Long.parseLong(String.valueOf(value))); break;
             }
 
-            if (owner != null) {
-                OfflinePlayer offlinePlayer = PlayerWarpsPlugin.get().getServer().getOfflinePlayer(owner);
-                setOwnerName(offlinePlayer.getName() != null ? offlinePlayer.getName() : "Unknown");
-            } else {
-                setOwnerName("Unknown");
-            }
+        }
+
+        // Resolved once after the whole map is read, not per key. A name stored with the warp
+        // wins, because the server's user cache expires after about a month and would otherwise
+        // turn every owner who has not logged in recently into "Unknown".
+        if (ownerName == null || ownerName.isEmpty()) {
+            ownerName = lookupOwnerName();
         }
 
         // A display name equal to the warp name means the owner never customized it, so it is
@@ -99,6 +103,8 @@ public class Warp implements ConfigurationSerializable {
             put("name", getName());
             put("display-name", getRawDisplayName());
             put("owner-id", getOwner().toString());
+            // Never persist the placeholder, so the name is looked up again next time.
+            put("owner-name", UNKNOWN_OWNER.equals(ownerName) ? null : ownerName);
             put("loc", getLocation());
             put("lore", getDescription());
             put("item", getMenuItem());
@@ -412,7 +418,35 @@ public class Warp implements ConfigurationSerializable {
     }
 
     public String getOwnerName() {
-        return ownerName;
+        return ownerName == null ? UNKNOWN_OWNER : ownerName;
+    }
+
+    public boolean hasKnownOwnerName() {
+        return ownerName != null && !ownerName.isEmpty() && !ownerName.equals(UNKNOWN_OWNER);
+    }
+
+    /**
+     * Re-reads the owner name from the server. Call from the main thread only.
+     */
+    public void refreshOwnerName() {
+        final String resolved = lookupOwnerName();
+        if (!UNKNOWN_OWNER.equals(resolved)) {
+            ownerName = resolved;
+        }
+    }
+
+    private String lookupOwnerName() {
+        if (owner == null) {
+            return UNKNOWN_OWNER;
+        }
+
+        final Player onlineOwner = PlayerWarpsPlugin.get().getServer().getPlayer(owner);
+        if (onlineOwner != null) {
+            return onlineOwner.getName();
+        }
+
+        final OfflinePlayer offlinePlayer = PlayerWarpsPlugin.get().getServer().getOfflinePlayer(owner);
+        return offlinePlayer.getName() != null ? offlinePlayer.getName() : UNKNOWN_OWNER;
     }
 
     public void setOwnerName(String ownerName) {

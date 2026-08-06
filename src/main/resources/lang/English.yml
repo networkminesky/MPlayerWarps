@@ -82,7 +82,7 @@ lang:
   warp-access-blocked: "%prefix% &cYou have been blocked from accessing this %warp% warp!"
   name-cant-contain-space: "%prefix% &7Name cannot contain space"
   enter-password: "Enter Password"
-  enter-warps-name: "Enter Warps Name"
+  enter-warps-name: "%prefix% &7Now enter password to lock this server:"
   password-setting-cancelled: "%prefix% &7Password setting was canceled."
   password-changed: "%prefix% &7Password has been changed!"
   password-length: "%prefix% &cPassword must contain at least 3 characters!"
@@ -253,7 +253,12 @@ lang:
     - "&7Actual status: &2%status%"
     - " "
     - "&e► Change availability of warp"
+  # Used by the MODAL input mode - shown as the dialog window title and its confirm button
+  modal-input-title: "PlayerWarps"
+  modal-input-submit: "Confirm"
   blocked-player-input: "%prefix% &7Now write the name of player you want to restrict from this warp:"
+  player-blocked: "%prefix% &7Player &f%player%&7 can no longer visit warp &f%warp%&7."
+  player-already-blocked: "%prefix% &cPlayer %player% is already blocked on this warp!"
   blocked-players-title: "Blocked players"
   blocked-players: "&aBlocked players &2(%amount%)"
   blocked-players-lore:
