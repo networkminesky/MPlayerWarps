@@ -4,7 +4,8 @@ description: Warps created by players for players
 version: ${project.version}
 
 main: dev.revivalo.playerwarps.PlayerWarpsPlugin
-api-version: 1.13
+api-version: 1.21
+folia-supported: true
 depend:
   - Vault # https://www.spigotmc.org/resources/vault.34315/
 softdepend:
@@ -21,13 +22,13 @@ softdepend:
   - WorldGuard # https://dev.bukkit.org/projects/worldguard/files
   - GriefPrevention # https://www.spigotmc.org/resources/griefprevention.1884/
   - Residence # https://www.spigotmc.org/resources/residence-1-7-10-up-to-1-21.11480/
-  - Territory # https://www.spigotmc.org/resources/%E2%AD%90%EF%B8%8Fterritory-new-land-claiming-plugin.121522/
+  - HuskClaims
 
 commands:
   pwarp:
     description: Main command for PlayerWarps plugin
     usage: /<command>
-    aliases: [pw, playerwarps]
+    aliases: [pw, playerwarps, go]
 
 permissions:
   playerwarps.use:

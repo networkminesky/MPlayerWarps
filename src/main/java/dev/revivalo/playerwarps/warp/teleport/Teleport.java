@@ -31,7 +31,7 @@ public class Teleport {
     public void proceed() {
         if (shouldRunTimer()) player.sendMessage(Lang.TELEPORTATION.asColoredString().replace("%time%", String.valueOf(delay)));
         this.task = new TeleportTask(this);
-        this.task.runTaskTimer(PlayerWarpsPlugin.get(), 0, 10);
+        this.task.start(PlayerWarpsPlugin.get());
     }
 
     public boolean isSafe() {

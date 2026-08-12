@@ -26,7 +26,7 @@ public final class HookRegister {
                 new WorldGuardHook(),
                 new AngeschossenLandsHook(),
                 new GriefPreventionHook(),
-                new TerritoryHook(),
+                new HuskClaimsHook(),
                 new HeadDatabaseHook(),
                 new BlueMapHook()
         );

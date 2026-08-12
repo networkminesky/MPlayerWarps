@@ -3,13 +3,16 @@ package dev.revivalo.playerwarps.warp.teleport.task;
 import dev.revivalo.playerwarps.configuration.file.Config;
 import dev.revivalo.playerwarps.configuration.file.Lang;
 import dev.revivalo.playerwarps.warp.teleport.Teleport;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.entity.Player;
 import org.bukkit.Location;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.plugin.Plugin;
 
-public class TeleportTask extends BukkitRunnable {
+import java.util.function.Consumer;
+
+public class TeleportTask implements Consumer<ScheduledTask> {
     private final Teleport teleport;
     private final Player player;
     private final Location location;
@@ -19,6 +22,8 @@ public class TeleportTask extends BukkitRunnable {
     private Teleport.Status status = Teleport.Status.PROCESSING;
     private int cycle = 0;
 
+    private ScheduledTask scheduledTask;
+
     public TeleportTask(Teleport teleport) {
         this.teleport = teleport;
         this.player = teleport.getPlayer();
@@ -26,7 +31,16 @@ public class TeleportTask extends BukkitRunnable {
         this.locationXZ = this.player.getLocation().getBlockX() + this.player.getLocation().getBlockZ();
     }
 
+    public ScheduledTask start(Plugin plugin) {
+        return player.getScheduler().runAtFixedRate(plugin, this, null, 1L, 10L);
+    }
+
     @Override
+    public void accept(ScheduledTask task) {
+        this.scheduledTask = task;
+        this.run();
+    }
+
     public void run() {
         if (teleport.shouldRunTimer()) {
             if (!player.isOnline()) {
@@ -48,7 +62,7 @@ public class TeleportTask extends BukkitRunnable {
 
             if (cycle == teleport.getDelay() * 2) {
                 cancel();
-                player.teleport(location);
+                player.teleportAsync(location);
                 status = Teleport.Status.SUCCESS;
                 return;
             }
@@ -56,8 +70,14 @@ public class TeleportTask extends BukkitRunnable {
             ++cycle;
         } else {
             cancel();
-            player.teleport(location);
+            player.teleportAsync(location);
             status = Teleport.Status.SUCCESS;
+        }
+    }
+
+    public void cancel() {
+        if (scheduledTask != null) {
+            scheduledTask.cancel();
         }
     }
 

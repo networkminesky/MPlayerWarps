@@ -10,19 +10,13 @@ import dev.revivalo.playerwarps.input.ModalInput;
 import dev.revivalo.playerwarps.input.PlayerInput;
 import dev.revivalo.playerwarps.menu.MenuRegister;
 import dev.revivalo.playerwarps.menu.page.Menu;
-import dev.revivalo.playerwarps.updatechecker.UpdateChecker;
-import dev.revivalo.playerwarps.updatechecker.UpdateNotificator;
 import dev.revivalo.playerwarps.user.UserHandler;
-import dev.revivalo.playerwarps.util.VersionUtil;
 import dev.revivalo.playerwarps.warp.WarpManager;
-import io.github.g00fy2.versioncompare.Version;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -75,57 +69,24 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
 
         setDataManager(new Data());
 
-        if (Config.UPDATE_CHECKER.asBoolean()) {
-            new UpdateChecker(this, 79089).getVersion(pluginVersion -> {
-                setLatestVersion(pluginVersion);
-
-                final String actualVersion = getDescription().getVersion();
-                Version version = new Version(pluginVersion);
-                final boolean isNewerVersion = version.isHigherThan(actualVersion);
-                final boolean isDevelopmentBuild = version.isLowerThan(actualVersion);
-
-                if (isDevelopmentBuild) {
-                    getLogger().info(String.format("You are running a development build (%s).", actualVersion));
-                } else {
-
-                    if (isNewerVersion) {
-                        getLogger().info(String.format("There is a new v%s update available (You are running v%s).\n" +
-                                "Outdated versions are no longer supported, get the latest one here: " +
-                                "https://bit.ly/revivalo-playerwarps", pluginVersion, actualVersion));
-                    } else {
-                        getLogger().info(String.format("You are running the latest release (%s).", pluginVersion));
-                    }
-                }
-                VersionUtil.setLatestVersion(!isNewerVersion);
-            });
-        }
-
         registerCommands();
 
         warpHandler.loadWarps();
 
         if (Config.AUTOSAVE_ENABLED.asBoolean()) {
             long intervalInTicks = (Config.AUTOSAVE_INTERVAL.asLong() * 60) * 20;
-            // Runs synchronously on purpose - saveWarps() serializes on the calling thread and
-            // offloads only the file write.
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    warpHandler.saveWarps();
-                }
-            }.runTaskTimer(this, intervalInTicks, intervalInTicks);
+            getServer().getGlobalRegionScheduler().runAtFixedRate(this, task -> {
+                warpHandler.saveWarps();
+            }, intervalInTicks, intervalInTicks);
         }
 
         MenuRegister.registerFiles();
 
         logInputMode();
-
-        new UpdateNotificator();
     }
 
     @Override
     public void onDisable() {
-        // The scheduler is already gone at this point, so the write must not be offloaded.
         warpHandler.saveWarps(false);
         Menu.shutdownExecutor();
     }
@@ -190,24 +151,20 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
         return getServer().getPluginManager().isPluginEnabled(pluginName);
     }
 
-    public BukkitScheduler getScheduler() {
-        return getServer().getScheduler();
-    }
-
     public void runAsync(Runnable runnable) {
-        getScheduler().runTaskAsynchronously(this, runnable);
+        getServer().getAsyncScheduler().runNow(this, task -> runnable.run());
     }
 
     public void runSync(Runnable runnable) {
-        getScheduler().runTask(this, runnable);
+        getServer().getGlobalRegionScheduler().run(this, task -> runnable.run());
     }
 
     public void runDelayed(Runnable runnable, long delay) {
-        getScheduler().runTaskLater(this, runnable, delay);
+        getServer().getGlobalRegionScheduler().runDelayed(this, task -> runnable.run(), delay);
     }
 
-    public BukkitTask runRepeating(Runnable runnable, long delay, long period) {
-        return getScheduler().runTaskTimer(this, runnable, delay, period);
+    public ScheduledTask runRepeating(Runnable runnable, long delay, long period) {
+        return getServer().getGlobalRegionScheduler().runAtFixedRate(this, task -> runnable.run(), delay, period);
     }
 
     public <T> CompletableFuture<T> completableFuture(Callable<T> callable) {

@@ -9,10 +9,10 @@ import dev.revivalo.playerwarps.util.PermissionUtil;
 import dev.revivalo.playerwarps.util.PlayerUtil;
 import dev.revivalo.playerwarps.warp.Warp;
 import dev.revivalo.playerwarps.warp.teleport.Teleport;
+import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -65,53 +65,55 @@ public class TeleportToWarpAction implements WarpAction<String> {
 
         teleport.proceed();
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (teleport.getTask().isResulted()) {
-                    cancel();
-                    if (teleport.getTask().getStatus() == Teleport.Status.SUCCESS) {
-                        if (!warp.canManage(player)) {
-                            HookRegister.ifEnabled(VaultHook.class, vaultHook -> {
-                                Economy economy = vaultHook.getApi();
-
-                                economy.withdrawPlayer(player, warp.getAdmission());
-
-                                final OfflinePlayer offlinePlayer = PlayerUtil.getOfflinePlayer(warp.getOwner());
-                                economy.depositPlayer(offlinePlayer, warp.getAdmission());
-                            });
-                        }
-
-                        if (Config.WARP_VISIT_NOTIFICATION.asBoolean()) {
-                            PlayerUtil.announce(Lang.WARP_VISIT_NOTIFICATION.asColoredString()
-                                            .replace("%warp%", warpName)
-                                            .replace("%player%", player.getName()),
-                                    player
-                            );
-                        }
-
-                        if (warp.getAdmission() != 0 && !isOwner) {
-                            player.sendMessage(Lang.TELEPORT_TO_WARP_WITH_ADMISSION.asColoredString()
-                                    .replace("%price%", String.valueOf(warp.getAdmission()))
-                                    .replace("%warp%", warpName)
-                                    .replace("%player%", warp.getOwnerName()));
-                        } else
-                            player.sendMessage(Lang.TELEPORT_TO_WARP.asColoredString()
-                                    .replace("%warp%", warpName)
-                                    .replace("%player%", warp.getOwnerName()));
-
-                        if (!isOwner) {
-                            warp.setVisits(warp.getVisits() + 1);
-                            warp.setTodayVisits(warp.getTodayVisits() + 1);
-                            warp.addUniqueVisitor(player.getUniqueId());
-                        }
-                    } else if (teleport.getTask().getStatus() == Teleport.Status.ERROR) {
-                        player.sendMessage(Lang.TELEPORTATION_CANCELLED.asColoredString());
-                    }
-                }
+        player.getScheduler().runAtFixedRate(PlayerWarpsPlugin.get(), (ScheduledTask task) -> {
+            if (!player.isOnline()) {
+                task.cancel();
+                return;
             }
 
-        }.runTaskTimer(PlayerWarpsPlugin.get(), 2, 2);
+            if (teleport.getTask().isResulted()) {
+                task.cancel();
+                if (teleport.getTask().getStatus() == Teleport.Status.SUCCESS) {
+                    if (!warp.canManage(player)) {
+                        HookRegister.ifEnabled(VaultHook.class, vaultHook -> {
+                            Economy economy = vaultHook.getApi();
+
+                            economy.withdrawPlayer(player, warp.getAdmission());
+
+                            final OfflinePlayer offlinePlayer = PlayerUtil.getOfflinePlayer(warp.getOwner());
+                            economy.depositPlayer(offlinePlayer, warp.getAdmission());
+                        });
+                    }
+
+                    if (Config.WARP_VISIT_NOTIFICATION.asBoolean()) {
+                        PlayerUtil.announce(Lang.WARP_VISIT_NOTIFICATION.asColoredString()
+                                        .replace("%warp%", warpName)
+                                        .replace("%player%", player.getName()),
+                                player
+                        );
+                    }
+
+                    if (warp.getAdmission() != 0 && !isOwner) {
+                        player.sendMessage(Lang.TELEPORT_TO_WARP_WITH_ADMISSION.asColoredString()
+                                .replace("%price%", String.valueOf(warp.getAdmission()))
+                                .replace("%warp%", warpName)
+                                .replace("%player%", warp.getOwnerName()));
+                    } else {
+                        player.sendMessage(Lang.TELEPORT_TO_WARP.asColoredString()
+                                .replace("%warp%", warpName)
+                                .replace("%player%", warp.getOwnerName()));
+                    }
+
+                    if (!isOwner) {
+                        warp.setVisits(warp.getVisits() + 1);
+                        warp.setTodayVisits(warp.getTodayVisits() + 1);
+                        warp.addUniqueVisitor(player.getUniqueId());
+                    }
+                } else if (teleport.getTask().getStatus() == Teleport.Status.ERROR) {
+                    player.sendMessage(Lang.TELEPORTATION_CANCELLED.asColoredString());
+                }
+            }
+        }, null, 2L, 2L);
 
         return true;
     }
