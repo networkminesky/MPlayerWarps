@@ -1,5 +1,5 @@
-title: "Confirm action?"
-rows: 3 # number of rows
+title: "Confirmar ação?"
+rows: 3 # número de linhas
 filler: none
 
 content:
@@ -10,7 +10,7 @@ content:
       - 10
       - 11
       - 12
-    name: "&a&lConfirm&c (- $%price%)"
+    name: "&a&lConfirmar&c (- $%price%)"
     lore: []
 
   cancel-button:
@@ -20,5 +20,5 @@ content:
       - 14
       - 15
       - 16
-    name: "&c&lCancel"
+    name: "&c&lCancelar"
     lore: []

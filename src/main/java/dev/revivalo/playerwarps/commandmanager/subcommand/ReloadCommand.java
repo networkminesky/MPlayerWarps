@@ -40,6 +40,11 @@ public class ReloadCommand implements SubCommand {
     }
 
     @Override
+    public List<String> getAliases() {
+        return List.of("recarregar");
+    }
+
+    @Override
     public void perform(CommandSender sender, String[] args) {
         CategoryManager.loadCategories();
         Config.reload();

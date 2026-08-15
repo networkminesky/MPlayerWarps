@@ -14,6 +14,7 @@ import dev.revivalo.playerwarps.user.UserHandler;
 import dev.revivalo.playerwarps.warp.WarpManager;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bstats.bukkit.Metrics;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -159,8 +160,24 @@ public final class PlayerWarpsPlugin extends JavaPlugin {
         getServer().getGlobalRegionScheduler().run(this, task -> runnable.run());
     }
 
+    public void runSync(Player player, Runnable runnable) {
+        if (player != null && player.isOnline()) {
+            player.getScheduler().run(this, task -> runnable.run(), null);
+        } else {
+            runSync(runnable);
+        }
+    }
+
     public void runDelayed(Runnable runnable, long delay) {
         getServer().getGlobalRegionScheduler().runDelayed(this, task -> runnable.run(), delay);
+    }
+
+    public void runDelayed(Player player, Runnable runnable, long delay) {
+        if (player != null && player.isOnline()) {
+            player.getScheduler().runDelayed(this, task -> runnable.run(), null, delay);
+        } else {
+            runDelayed(runnable, delay);
+        }
     }
 
     public ScheduledTask runRepeating(Runnable runnable, long delay, long period) {

@@ -82,7 +82,7 @@ public final class PlayerInput {
      * category, sorting and search results they had, which their plain open() would reset.
      */
     private static void reopen(Player player, Menu menu) {
-        PlayerWarpsPlugin.get().runSync(() -> {
+        PlayerWarpsPlugin.get().runSync(player, () -> {
             if (menu instanceof WarpsMenu warpsMenu) {
                 warpsMenu.open(player, warpsMenu.getCategoryName(), warpsMenu.getSortType(), warpsMenu.getFoundWarps());
             } else {
@@ -134,7 +134,7 @@ public final class PlayerInput {
 
                         // Guarantees the same contract as the chat mode: callers continue on
                         // the main thread and may open menus straight away.
-                        PlayerWarpsPlugin.get().runSync(() -> future.complete(input));
+                        PlayerWarpsPlugin.get().runSync(signPlayer, () -> future.complete(input));
 
                         return Collections.emptyList();
                     })
@@ -163,7 +163,7 @@ public final class PlayerInput {
                 TextUtil.removeColors(Lang.MODAL_INPUT_TITLE.asColoredString()),
                 TextUtil.removeColors(promptText(prompt, warp)),
                 TextUtil.removeColors(Lang.MODAL_INPUT_SUBMIT.asColoredString()),
-                input -> PlayerWarpsPlugin.get().runSync(() -> future.complete(input)));
+                input -> PlayerWarpsPlugin.get().runSync(player, () -> future.complete(input)));
 
         if (!opened) {
             Debug.log("Modal dialog unavailable, using the chat input for %s.", player.getName());
@@ -201,7 +201,7 @@ public final class PlayerInput {
                 HandlerList.unregisterAll(this);
 
                 // The chat event is asynchronous, so hop back before handing the value over.
-                PlayerWarpsPlugin.get().runSync(() -> future.complete(event.getMessage()));
+                PlayerWarpsPlugin.get().runSync(player, () -> future.complete(event.getMessage()));
             }
 
             @EventHandler
@@ -225,7 +225,7 @@ public final class PlayerInput {
 
         Bukkit.getPluginManager().registerEvents(listener, PlayerWarpsPlugin.get());
 
-        PlayerWarpsPlugin.get().runDelayed(() -> {
+        PlayerWarpsPlugin.get().runDelayed(player, () -> {
             if (!future.isDone()) {
                 future.completeExceptionally(new TimeoutException("Player did not respond in time"));
                 HandlerList.unregisterAll(listener);

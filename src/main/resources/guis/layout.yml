@@ -5,7 +5,7 @@ content:
     type: OPEN_MAIN_MENU
     slots:
       - 48
-    name: '&eWarps Overview'
+    name: '&eVisão Geral de Warps'
     actions:
       - '[open] categories'
     lore: []
@@ -14,7 +14,7 @@ content:
     item: REPEATER
     slots:
       - 49
-    name: '&eMy Warps'
+    name: '&eMeus Warps'
     actions:
       - '[open] mywarps'
     lore: []
@@ -23,7 +23,7 @@ content:
     item: NAME_TAG
     slots:
       - 50
-    name: '&eSaved Warps'
+    name: '&eWarps Salvos'
     actions:
       - '[open] favorites'
     lore: []
@@ -32,7 +32,7 @@ content:
     item: ARROW
     slots:
       - 53
-    name: '&aNext Page'
+    name: '&aPróxima Página'
     actions:
       - '[next_page]'
     lore: []
@@ -41,7 +41,7 @@ content:
     item: ARROW
     slots:
       - 45
-    name: '&cPrevious Page'
+    name: '&cPágina Anterior'
     actions:
       - '[previous_page]'
     lore: []
@@ -51,7 +51,7 @@ content:
     type: SEARCH_WARP
     slots:
       - 52
-    name: '&eSearch Warp'
+    name: '&ePesquisar Warp'
     actions:
       - '[search]'
     lore: []
@@ -60,13 +60,13 @@ content:
     item: REPEATER
     slots:
       - 46
-    name: '&eSort Warps'
+    name: '&eOrdenar Warps'
     lore:
-      - '%current-alphabetical% Alphabetical'
-      - '%current-visits% Visits'
-      - '%current-latest% Latest'
-      - '%current-rating% Rating'
+      - '%current-alphabetical% Alfabética'
+      - '%current-visits% Visitas'
+      - '%current-latest% Mais Recentes'
+      - '%current-rating% Avaliação'
       - ''
-      - '&b► Click to sort by %next%'
+      - '&b► Clique para ordenar por %next%'
     actions:
       - '[sort]'

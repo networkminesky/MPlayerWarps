@@ -1,37 +1,37 @@
-title: "Reviewing warp %warp%"
+title: "Avaliando warp %warp%"
 rows: 4
 content:
   one-star:
     item: SUNFLOWER
-    name: "&e&l1 Star"
+    name: "&e&l1 Estrela"
     type: REVIEW
     data: 1
     slots:
       - 11
   two-star:
     item: SUNFLOWER
-    name: "&e&l2 Stars"
+    name: "&e&l2 Estrelas"
     type: REVIEW
     data: 2
     slots:
       - 12
   three-stars:
     item: SUNFLOWER
-    name: "&e&l3 Stars"
+    name: "&e&l3 Estrelas"
     type: REVIEW
     data: 3
     slots:
       - 13
   four-stars:
     item: SUNFLOWER
-    name: "&e&l4 Stars"
+    name: "&e&l4 Estrelas"
     type: REVIEW
     data: 4
     slots:
       - 14
   five-stars:
     item: SUNFLOWER
-    name: "&e&l5 Stars"
+    name: "&e&l5 Estrelas"
     type: REVIEW
     data: 5
     slots:

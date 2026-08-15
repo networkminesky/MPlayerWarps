@@ -11,17 +11,17 @@ import java.util.List;
 public class HelpCommand implements SubCommand {
     @Override
     public String getName() {
-        return "help";
+        return "ajuda";
     }
 
     @Override
     public String getDescription() {
-        return "Sends a list with a commands and instructions";
+        return "Envia uma lista com comandos e instruções";
     }
 
     @Override
     public String getSyntax() {
-        return "/pwarp help";
+        return "/go ajuda";
     }
 
     @Override
@@ -32,6 +32,11 @@ public class HelpCommand implements SubCommand {
     @Override
     public List<String> getTabCompletion(CommandSender sender, int index, String[] args) {
         return null;
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("help");
     }
 
     @Override

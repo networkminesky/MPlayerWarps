@@ -15,17 +15,17 @@ import java.util.List;
 public class AboutSubCommand implements SubCommand {
     @Override
     public @NotNull String getName() {
-        return "about";
+        return "sobre";
     }
 
     @Override
     public @NotNull String getDescription() {
-        return "Shows information about plugin";
+        return "Mostra informações sobre o plugin";
     }
 
     @Override
     public @NotNull String getSyntax() {
-        return "/pwarp about";
+        return "/go sobre";
     }
 
     @Override
@@ -39,19 +39,24 @@ public class AboutSubCommand implements SubCommand {
     }
 
     @Override
+    public List<String> getAliases() {
+        return List.of("about");
+    }
+
+    @Override
     public void perform(@NotNull CommandSender sender, String[] args) {
         PlayerWarpsPlugin plugin = PlayerWarpsPlugin.get();
         plugin.runAsync(() -> {
             sender.sendMessage(
-                    "Developers: " + String.join(", ", plugin.getDescription().getAuthors() )+ "\n" +
-                            "Version: " + plugin.getDescription().getVersion() + "\n" +
+                    "Desenvolvedores: " + String.join(", ", plugin.getDescription().getAuthors() )+ "\n" +
+                            "Versão: " + plugin.getDescription().getVersion() + "\n" +
                             "Wiki: https://playerwarps.athelion.eu/\n" +
-                            "Support: https://discord.athelion.eu/\n" +
-                            "Platform: " + plugin.getServer().getName() + " " + plugin.getServer().getVersion()
+                            "Suporte: https://discord.athelion.eu/\n" +
+                            "Plataforma: " + plugin.getServer().getName() + " " + plugin.getServer().getVersion()
             );
             Collection<Hook<?>> hooks = HookRegister.getHooks();
             if (!hooks.isEmpty()) {
-                sender.sendMessage("Hooks: " + (hooks.stream().noneMatch(Hook::isOn) ? "None" : ""));
+                sender.sendMessage("Integrações (Hooks): " + (hooks.stream().noneMatch(Hook::isOn) ? "Nenhuma" : ""));
                 hooks.stream().filter(Hook::isOn).forEach(hook -> sender.sendMessage(" " + hook.getName() + " - " + hook.getVersion()));
             }
         });

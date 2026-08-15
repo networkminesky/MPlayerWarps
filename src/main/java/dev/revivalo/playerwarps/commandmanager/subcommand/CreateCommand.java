@@ -15,17 +15,17 @@ import java.util.List;
 public class CreateCommand implements SubCommand {
     @Override
     public String getName() {
-        return "create";
+        return "criar";
     }
 
     @Override
     public String getDescription() {
-        return "Creates new pwarp";
+        return "Cria um novo pwarp";
     }
 
     @Override
     public String getSyntax() {
-        return "/pwarp create [warpName]";
+        return "/go criar [nome]";
     }
 
     @Override
@@ -39,9 +39,14 @@ public class CreateCommand implements SubCommand {
     }
 
     @Override
+    public List<String> getAliases() {
+        return List.of("create");
+    }
+
+    @Override
     public void perform(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("[PlayerWarps] Warps can create only player!");
+            sender.sendMessage("[WARPS] Apenas jogadores podem criar warps!");
             return;
         }
 

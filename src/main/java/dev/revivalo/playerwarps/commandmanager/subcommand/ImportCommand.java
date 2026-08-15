@@ -11,17 +11,17 @@ import java.util.List;
 public class ImportCommand implements SubCommand {
     @Override
     public String getName() {
-        return "import";
+        return "importar";
     }
 
     @Override
     public String getDescription() {
-        return "Imports the input mode";
+        return "Importa os warps";
     }
 
     @Override
     public String getSyntax() {
-        return "/pwarp import";
+        return "/go importar";
     }
 
     @Override
@@ -35,9 +35,14 @@ public class ImportCommand implements SubCommand {
     }
 
     @Override
+    public List<String> getAliases() {
+        return List.of("import");
+    }
+
+    @Override
     public void perform(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("[PlayerWarps] Warps can create only player!");
+            sender.sendMessage("[WARPS] Apenas jogadores podem executar este comando!");
             return;
         }
 

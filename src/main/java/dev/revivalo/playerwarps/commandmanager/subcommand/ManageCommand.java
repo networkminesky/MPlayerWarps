@@ -17,17 +17,17 @@ import java.util.stream.Collectors;
 public class ManageCommand implements SubCommand {
     @Override
     public String getName() {
-        return "manage";
+        return "gerenciar";
     }
 
     @Override
     public String getDescription() {
-        return "Opens manage menu for stated warp";
+        return "Abre o menu de gerenciamento do warp especificado";
     }
 
     @Override
     public String getSyntax() {
-        return "/pwarp manage [warpName]";
+        return "/go gerenciar [nome]";
     }
 
     @Override
@@ -52,9 +52,14 @@ public class ManageCommand implements SubCommand {
     }
 
     @Override
+    public List<String> getAliases() {
+        return List.of("manage");
+    }
+
+    @Override
     public void perform(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("[PlayerWarps] Only in-game command!");
+            sender.sendMessage("[WARPS] Comando apenas para jogadores dentro do jogo!");
             return;
         }
 

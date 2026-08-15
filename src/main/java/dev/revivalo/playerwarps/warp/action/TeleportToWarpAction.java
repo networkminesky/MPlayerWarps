@@ -15,6 +15,8 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class TeleportToWarpAction implements WarpAction<String> {
     /**
@@ -54,7 +56,25 @@ public class TeleportToWarpAction implements WarpAction<String> {
         }
 
         Teleport teleport = new Teleport(player, warp.getLocation());
-        if (Config.CHECK_FOR_SAFE_TELEPORT.asBoolean() && !teleport.isSafe() && !hasConfirmedUnsafe(player, warp)) {
+
+        boolean isSafe = true;
+        if (Config.CHECK_FOR_SAFE_TELEPORT.asBoolean() && !hasConfirmedUnsafe(player, warp)) {
+            if (org.bukkit.Bukkit.isOwnedByCurrentRegion(warp.getLocation())) {
+                isSafe = teleport.isSafe();
+            } else {
+                CompletableFuture<Boolean> safeFuture = new CompletableFuture<>();
+                org.bukkit.Bukkit.getRegionScheduler().run(PlayerWarpsPlugin.get(), warp.getLocation(), task -> {
+                    safeFuture.complete(teleport.isSafe());
+                });
+                try {
+                    isSafe = safeFuture.get(1, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    isSafe = false;
+                }
+            }
+        }
+
+        if (!isSafe) {
             unsafeConfirmations.put(player.getUniqueId(),
                     new UnsafeConfirmation(warp.getWarpID(), System.currentTimeMillis() + UNSAFE_CONFIRMATION_TIMEOUT));
             player.sendMessage(Lang.TELEPORTATION_UNSAFE.asColoredString());

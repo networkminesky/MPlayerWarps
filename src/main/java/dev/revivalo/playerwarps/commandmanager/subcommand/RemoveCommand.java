@@ -16,17 +16,17 @@ import java.util.Optional;
 public class RemoveCommand implements SubCommand {
     @Override
     public String getName() {
-        return "remove";
+        return "remover";
     }
 
     @Override
     public String getDescription() {
-        return "Deletes existing pwarp";
+        return "Deleta um warp existente";
     }
 
     @Override
     public String getSyntax() {
-        return "/pwarp remove [warpName]";
+        return "/go remover [nome]";
     }
 
     @Override
@@ -37,6 +37,11 @@ public class RemoveCommand implements SubCommand {
     @Override
     public List<String> getTabCompletion(CommandSender sender, int index, String[] args) {
         return null;
+    }
+
+    @Override
+    public List<String> getAliases() {
+        return List.of("remove");
     }
 
     @Override

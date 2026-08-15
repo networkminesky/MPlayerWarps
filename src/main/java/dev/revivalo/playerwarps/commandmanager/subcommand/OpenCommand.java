@@ -16,17 +16,17 @@ import java.util.List;
 public class OpenCommand implements SubCommand {
     @Override
     public String getName() {
-        return "open";
+        return "abrir";
     }
 
     @Override
     public String getDescription() {
-        return "Opens specified menu";
+        return "Abre o menu especificado";
     }
 
     @Override
     public String getSyntax() {
-        return "/pwarp open <menu>";
+        return "/go abrir <menu>";
     }
 
     @Override
@@ -40,9 +40,14 @@ public class OpenCommand implements SubCommand {
     }
 
     @Override
+    public List<String> getAliases() {
+        return List.of("open");
+    }
+
+    @Override
     public void perform(CommandSender sender, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("[PlayerWarps] Warps can create only player!");
+            sender.sendMessage("[WARPS] Apenas jogadores podem executar este comando!");
             return;
         }
 

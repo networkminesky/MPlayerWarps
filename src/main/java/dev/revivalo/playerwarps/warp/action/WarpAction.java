@@ -59,7 +59,7 @@ public interface WarpAction<T> {
                     return;
                 }
 
-                PlayerWarpsPlugin.get().runSync(() -> {
+                PlayerWarpsPlugin.get().runSync(player, () -> {
                     new ConfirmationMenu(warp, data)
                             .setMenuToOpen(menuToOpen)
                             .open(player, this);

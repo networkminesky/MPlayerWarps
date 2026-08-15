@@ -37,7 +37,7 @@ public abstract class MainCommand implements TabExecutor {
             return true;
         }
 
-        SubCommand subCommand = subCommands.stream().filter(sc -> sc.getName().equalsIgnoreCase(args[0])).findAny().orElse(getDefaultSyntax());
+        SubCommand subCommand = subCommands.stream().filter(sc -> matches(sc, args[0])).findAny().orElse(getDefaultSyntax());
 
         if (subCommand == null) {
             Optional<Warp> warpOptional = PlayerWarpsPlugin.getWarpHandler().getWarpFromName(args[0]);
@@ -139,5 +139,13 @@ public abstract class MainCommand implements TabExecutor {
     @SuppressWarnings("unused")
     public Set<SubCommand> getSubCommands() {
         return new HashSet<>(subCommands);
+    }
+
+    public boolean matches(SubCommand sc, String input) {
+        if (input.equalsIgnoreCase(sc.getName())) return true;
+        for (String alias : sc.getAliases()) {
+            if (input.equalsIgnoreCase(alias)) return true;
+        }
+        return false;
     }
 }

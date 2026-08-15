@@ -26,7 +26,7 @@ public class SetPasswordAction implements WarpAction<String>, Inputable {
 
         new SetStatusAction().proceed(player, warp, WarpStatus.PASSWORD_PROTECTED);
 
-        PlayerWarpsPlugin.get().runDelayed(() -> new ManageMenu(warp).openFor(player), 3);
+        PlayerWarpsPlugin.get().runDelayed(player, () -> new ManageMenu(warp).openFor(player), 3);
 
         return true;
     }

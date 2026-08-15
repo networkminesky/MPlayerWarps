@@ -1,59 +1,60 @@
 categories:
-  event:
-    name: "&aEvents &2(%number%)"
+  eventos:
+    name: "&aEventos &2(%number%)"
     permission: playerwarps.category.events
-    position: 20 # item's position inside category menu
+    position: 20 # posição do item dentro do menu de categorias
     item: DIAMOND
     lore:
-      - "&7Events created by players"
+      - "&7Eventos criados por jogadores"
       - " "
-      - "&e► Click to open"
-  building:
-    name: "&aBuildings &2(%number%)"
+      - "&e► Clique para abrir"
+  construções:
+    name: "&aConstruções &2(%number%)"
     permission: playerwarps.category.buildings
     position: 21
     item: BRICKS
     lore:
-      - "&7Players houses or towns"
+      - "&7Casas ou cidades de"
+      - "&7jogadores"
       - " "
-      - "&e► Click to open"
-  shop:
-    name: "&aShops &2(%number%)"
+      - "&e► Clique para abrir"
+  loja:
+    name: "&aLojas &2(%number%)"
     permission: playerwarps.category.shops
     position: 22
     item: CHEST
     lore:
-      - "&7Here you can find"
-      - "&7shops by players"
+      - "&7Aqui você pode encontrar"
+      - "&7lojas de jogadores"
       - " "
-      - "&e► Click to open"
+      - "&e► Clique para abrir"
   farm:
     name: "&aFarms &2(%number%)"
     permission: playerwarps.category.farms
     position: 23
     item: WHEAT
     lore:
-      - "&7Public farms are"
-      - "&7located here"
+      - "&7Farms públicas estão"
+      - "&7localizadas aqui"
       - " "
-      - "&e► Click to open"
-  other:
+      - "&e► Clique para abrir"
+  outros:
     permission: playerwarps.category.other
-    name: "&aOther &2(%number%)"
+    name: "&aOutros &2(%number%)"
     position: 24
     item: PAPER
     lore:
-      - "&7Warps that do not fit"
-      - "&7into the previous categories"
+      - "&7Warps que não se encaixam"
+      - "&7nas categorias anteriores"
       - " "
-      - "&e► Click to open"
-  all:
+      - "&e► Clique para abrir"
+  todos:
     default: true
-    name: "&aAll Warps &2(%number%)"
+    name: "&aTodos os Warps &2(%number%)"
     position: 31
     item: BOOK
     lore:
-      - "&7List of all"
-      - "&7available player warps"
+      - "&7Lista de todos os"
+      - "&7warps de jogadores disponíveis"
       - " "
-      - "&e► Click to open"
+      - "&e► Clique para abrir"

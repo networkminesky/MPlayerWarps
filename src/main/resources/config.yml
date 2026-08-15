@@ -7,34 +7,34 @@
 #                   __/ |                            | |
 #                 |___/                             |_|
 #
-#                                                by Athelion Development
+#                                                por Athelion Development
 #
-# Get the new textured custom UI from here: https://builtbybit.com/resources/playerwarps-custom-ui.51704/
+# Obtenha a nova interface personalizada texturizada aqui: https://builtbybit.com/resources/playerwarps-custom-ui.51704/
 #
-# If you have some questions, join https://discord.gg/TfUC8uJ for help
+# Se você tiver alguma dúvida, entre em https://discord.gg/TfUC8uJ para obter ajuda
 #
-# From 1.16 version you can also use HEX colors.
-# Instead of &f format use <#ffffff>
+# A partir da versão 1.16 você também pode usar cores HEX.
+# Em vez do formato &f, use <#ffffff>
 #
 config:
   debug: false
-  language: English
-  # How players type values in (warp name, description, password, ...)
-  # CHAT  - the player writes the value into chat
-  # SIGN  - the player writes the value into a sign GUI
-  # MODAL - the player writes the value into a dialog window
-  #         (needs Minecraft 1.21.6+ and Paper/a Paper fork, otherwise CHAT is used)
+  language: Portuguese
+  # Como os jogadores digitam os valores (nome do warp, descrição, senha, ...)
+  # CHAT  - o jogador digita o valor no chat
+  # SIGN  - o jogador digita o valor em uma interface de placa (Sign GUI)
+  # MODAL - o jogador digita o valor em uma janela de diálogo (Modal)
+  #         (requer Minecraft 1.21.6+ e Paper ou algum fork do Paper, caso contrário CHAT será usado)
   input-mode: CHAT
   update-checker: true
-  autosave-enabled: true # recommended setting to true
+  autosave-enabled: true # configuração recomendada como true
   autosave-announce: true
   date-format: dd/MM/yyyy
   warp-name-format: "&b&n%warpName%"
 
   #demand-verification: false
 
-  # 30 minutes is recommended
-  autosave-interval: 30 # in minutes
+  # Recomenda-se 30 minutos
+  autosave-interval: 30 # em minutos
   teleport-delay: 3
   currency-symbol: "$"
   allow-colors-in-warp-display-names: true
@@ -44,7 +44,7 @@ config:
     - LATEST
     - RATING
 
-  # hooks
+  # integrações (hooks)
   placeholder-api-hook-enabled: true
   dynmap-hook-enabled: true
   bluemap-hook-enabled: true
@@ -56,7 +56,7 @@ config:
   items-adder-hook-enabled: true
   oraxen-hook-enabled: true
   residence-hook-enabled: true
-  superior-sky-block-hook-enabled: trie
+  superior-sky-block-hook-enabled: true
   vault-hook-enabled: true
   world-guard-hook-enabled: true
   bentobox-hook-enabled: true
@@ -66,28 +66,28 @@ config:
   selected-sort: "&a ►"
   other-sort: "&7  "
 
-  # All icons can be found here: https://github.com/webbukkit/dynmap/wiki/Using-Markers
+  # Todos os ícones podem ser encontrados aqui: https://github.com/webbukkit/dynmap/wiki/Using-Markers
   dynmap-enabled: true
   dynmap-marker-icon: "blueflag"
-  dynmap-marker-label: "Warp: %warp% by %owner%"
+  dynmap-marker-label: "Warp: %warp% por %owner%"
 
   warp-description-color: "&9"
 
   #
   warp-creation-for-trusted-players: true
 
-  # Pricing section
-  # Choose between FREE, FIXED, or CUSTOM pricing models.
+  # Seção de Preços
+  # Escolha entre os modelos de preço FREE (Gratuito), FIXED (Fixo) ou CUSTOM (Personalizado).
   free-warps: 1
   warp-pricing: CUSTOM
-  warp-fixed-price: 100000  # The price per warp creation when FIXED pricing is used.
-  warp-custom-price: "100000 + ({amount} * 20000)"  # Custom pricing formula for creating warps.
+  warp-fixed-price: 100000  # O preço por criação de warp quando o preço FIXED é usado.
+  warp-custom-price: "100000 + ({amount} * 20000)"  # Fórmula de preço personalizada para criar warps.
 
   max-featured-warps: 5
-  feature-warp-duration: 4320 # In minutes
+  feature-warp-duration: 4320 # Em minutos
 
-  # To disable the fee features, set them to 0
-  # This option works only with installed Vault plugin
+  # Para desativar as taxas de recursos, defina-as como 0
+  # Esta opção funciona apenas com o plugin Vault instalado
   feature-warp-fee: 2000
   relocate-warp-fee: 1000
   rename-warp-fee: 500
@@ -99,12 +99,12 @@ config:
   set-description-characters-limit: 32
   set-display-name-fee: 200
   set-admission-fee: 0
-  # To disable refund set to 0
+  # Para desativar o reembolso, defina como 0
   delete-warp-refund: 2000
   max-warp-admission: 100000
-  # Make sure you are using valid IDs
+  # Certifique-se de usar IDs válidos
   default-warp-item: ENDER_PEARL
-  # Can be: OPENED, CLOSED
+  # Pode ser: OPENED, CLOSED
   default-warp-status: OPENED
   banned-items:
     - DEBUG_STICK
@@ -116,7 +116,7 @@ config:
     - disabledworld1
     - disabledworld2
     - disabledworld3
-  enabled-regions: # World Guard regions
+  enabled-regions: # Regiões do World Guard
     - enabledregion1
     - enabledregion2
     - enabledregion3
@@ -126,13 +126,13 @@ config:
   enable-warp-search: true
   enable-warp-rating: true
 
-  warp-visit-notification: true
-  warp-creation-notification: true
+  warp-visit-notification: false
+  warp-creation-notification: false
 
-  # This option note player that warp teleportation is charged
+  # Esta opção avisa ao jogador que o teletransporte do warp é cobrado
   allow-teleport-accept-menu: true
-  # Checking if the warp destination is safe (fire, lava, fall from a height or of the world)
-  check-for-safe-teleport: true
+  # Verifica se o destino do warp é seguro (fogo, lava, queda de altura ou do mundo)
+  check-for-safe-teleport: false
 
   next-page-item: ARROW
   previous-page-item: ARROW
@@ -152,7 +152,7 @@ config:
   page-item: ARROW
   star-review-item: SUNFLOWER
   back-item: OAK_BUTTON
-  # Settings menu items
+  # Itens do menu de configurações
   set-price-item: SUNFLOWER
   set-category-item: WHITE_BANNER
   change-display-name-item: WRITABLE_BOOK
@@ -165,8 +165,8 @@ config:
   change-owner-item: PLAYER_HEAD
   blocked-players-item: SHIELD
 
-  # To remove item from menu, set
-  # its position to -1
+  # Para remover um item do menu, defina
+  # sua posição como -1
   warp-overview-position: 4
   set-price-position: 11
   set-category-position: 12

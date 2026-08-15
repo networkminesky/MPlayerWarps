@@ -16,5 +16,7 @@ public interface SubCommand {
 
     List<String> getTabCompletion(CommandSender sender, int index, String[] args);
 
+    List<String> getAliases();
+
     void perform(CommandSender sender, String[] args);
 }

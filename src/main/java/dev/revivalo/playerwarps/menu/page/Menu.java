@@ -35,17 +35,17 @@ public abstract class Menu {
 
     public MenuTemplate getTemplate() {
         return TEMPLATE_CACHE.computeIfAbsent(this.getClass(), clazz -> new MenuTemplate(
-                new YamlFile("guis/" + this.getClass().getSimpleName().toLowerCase() + ".yml",
-                        PlayerWarpsPlugin.get().getDataFolder(), YamlFile.UpdateMethod.ON_LOAD)
-        )
+                        new YamlFile("guis/" + this.getClass().getSimpleName().toLowerCase() + ".yml",
+                                PlayerWarpsPlugin.get().getDataFolder(), YamlFile.UpdateMethod.ON_LOAD)
+                )
         );
     }
 
     public MenuTemplate getLayoutTemplate() {
         return TEMPLATE_CACHE.computeIfAbsent(Menu.class, clazz -> new MenuTemplate(
-                new YamlFile("guis/layout.yml",
-                        PlayerWarpsPlugin.get().getDataFolder(), YamlFile.UpdateMethod.ON_LOAD)
-        )
+                        new YamlFile("guis/layout.yml",
+                                PlayerWarpsPlugin.get().getDataFolder(), YamlFile.UpdateMethod.ON_LOAD)
+                )
         );
     }
 
@@ -118,7 +118,7 @@ public abstract class Menu {
         clear();
         //getBaseGui().update();
         fill();
-        PlayerWarpsPlugin.get().runSync(() -> open(getPlayer()));
+        PlayerWarpsPlugin.get().runSync(getPlayer(), () -> open(getPlayer()));
     }
 
     protected void preFill(Menu menu) {
@@ -136,7 +136,7 @@ public abstract class Menu {
                         item.draw(getPlaceholders((WarpsMenu) menu))
                                 .asGuiItem(event -> {
                                     if (!item.getClickActions().isEmpty()) {
-                                        ActionsExecutor.executeActions(player, item.getClickActions(), menu); //TODO: Přidat jako parametr nějaké pole objektů? Pro předávání dat
+                                        ActionsExecutor.executeActions(player, item.getClickActions(), menu); //TODO: Přidat jako parâmetro nějaké pole objektů? Pro předávání dat
                                     }
 
                                 })
