@@ -5,7 +5,13 @@ import dev.revivalo.playerwarps.configuration.file.Lang;
 import dev.revivalo.playerwarps.util.PlayerUtil;
 import dev.revivalo.playerwarps.warp.Warp;
 import dev.revivalo.playerwarps.warp.action.PreTeleportToWarpAction;
+import net.william278.huskclaims.api.HuskClaimsAPI;
+import net.william278.huskclaims.claim.Claim;
+import net.william278.huskclaims.position.Position;
+import net.william278.huskclaims.position.World;
+import net.william278.huskclaims.user.User;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
@@ -57,6 +63,20 @@ public abstract class MainCommand implements TabExecutor {
                 if (!sender.hasPermission("playerwarps.teleport.others")) {
                     sender.sendMessage(Lang.INSUFFICIENT_PERMISSIONS.asColoredString().replace("%permission%", "playerwarps.teleport.others"));
                     return false;
+                }
+            }
+
+            Location l = warpOptional.get().getLocation();
+            World world = fromBukkit(l.getWorld());
+            Position pos = Position.at(l.getX(), l.getY(), l.getZ(), world);
+            Optional<Claim> claimOptional = HuskClaimsAPI.getInstance().getClaimAt(pos);
+
+            if (claimOptional.isPresent()) {
+                Claim claim = claimOptional.get();
+                User user = User.of(player.getUniqueId(), player.getName());
+                if (claim.isUserBanned(user)) {
+                    sender.sendMessage(Lang.CLAIM_BANNED.asColoredString());
+                    return true;
                 }
             }
 
@@ -147,5 +167,17 @@ public abstract class MainCommand implements TabExecutor {
             if (input.equalsIgnoreCase(alias)) return true;
         }
         return false;
+    }
+
+    public static World fromBukkit(org.bukkit.World bukkitWorld) {
+        if (bukkitWorld == null) {
+            return null;
+        }
+
+        return net.william278.huskclaims.position.World.of(
+                bukkitWorld.getName(),
+                bukkitWorld.getUID(),
+                bukkitWorld.getEnvironment().name()
+        );
     }
 }

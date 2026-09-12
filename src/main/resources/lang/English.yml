@@ -19,6 +19,8 @@ lang:
   warp-visit-notification: "%prefix% &f%player%&7 visitou o warp &f%warp%"
   warp-creation-notification: "%prefix% &f%player%&7 criou o warp &f%warp%"
 
+  claim-banned: "%prefix% &7Você está banido deste terreno e não pode se teleportar."
+
   insufficient-perms-for-category: "&4Categoria Bloqueada"
   insufficient-perms-for-category-lore:
     - "&cVocê precisa da permissão %permission%"
