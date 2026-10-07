@@ -218,7 +218,9 @@ public abstract class BaseGui implements InventoryHolder {
         if (!player.isSleeping()) {
             this.inventory.clear();
             this.populateGui();
-            player.openInventory(this.inventory);
+            player.getScheduler().run(plugin, (pTask) -> {
+                player.openInventory(this.inventory);
+            }, null);
         }
     }
 

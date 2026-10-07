@@ -6,10 +6,13 @@ import net.william278.huskclaims.api.HuskClaimsAPI;
 import net.william278.huskclaims.claim.Claim;
 import net.william278.huskclaims.position.Position;
 import net.william278.huskclaims.position.World;
+import net.william278.huskclaims.trust.Trustable;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public class HuskClaimsChecker implements Checker {
     private final HuskClaimsAPI huskClaims;
@@ -20,30 +23,20 @@ public class HuskClaimsChecker implements Checker {
     @Override
     public boolean validate(Player player) {
         Location loc = player.getLocation();
-        World world = fromBukkit(loc.getWorld());
-        Position position = Position.at(loc.getX(), loc.getY(), loc.getZ(), world);
-        Optional<Claim> claimOpt = huskClaims.getClaimAt(position);
-        if (claimOpt.isEmpty()) return true;
 
-        Claim claim = claimOpt.get();
+        World world = huskClaims.getWorld(loc.getWorld().getName());
+        Position position = huskClaims.getPosition(loc.getX(), loc.getY(), loc.getZ(), world);
+        Claim claim = huskClaims.getExactClaimAt(position).orElse(null);
+        if (claim == null) return true;
 
-        if (!claim.getOwner().get().equals(player.getUniqueId())) {
+        Set<UUID> uuids = claim.getTrustedUsers().keySet();
+
+        UUID owner = claim.getOwner().orElse(null);
+        if (!uuids.contains(player.getUniqueId()) || (owner != null && !owner.equals(player.getUniqueId()))) {
             player.sendMessage(Lang.TRIED_TO_CREATE_WARP_IN_FOREIGN_CLAIM.asColoredString());
             return false;
         }
 
         return true;
-    }
-
-    public static World fromBukkit(org.bukkit.World bukkitWorld) {
-        if (bukkitWorld == null) {
-            return null;
-        }
-
-        return net.william278.huskclaims.position.World.of(
-                bukkitWorld.getName(),
-                bukkitWorld.getUID(),
-                bukkitWorld.getEnvironment().name()
-        );
     }
 }

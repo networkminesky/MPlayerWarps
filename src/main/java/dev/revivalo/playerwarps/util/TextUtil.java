@@ -7,7 +7,7 @@ import dev.revivalo.playerwarps.menu.ActionType;
 import dev.revivalo.playerwarps.menu.ClickAction;
 import dev.revivalo.playerwarps.warp.Warp;
 import net.md_5.bungee.api.ChatColor;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
